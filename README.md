@@ -1,53 +1,92 @@
-# 🚀 Electron React TypeScript Tailwind Starter
+# Electron React TypeScript Tailwind Starter
 
-[![Build and Test](https://github.com/rostislavjadavan/electron-react-typescript-tailwind-starter/actions/workflows/build.yml/badge.svg)](https://github.com/rostislavjadavan/electron-react-typescript-tailwind-starter/actions/workflows/build.yml)
+> Instruções básicas para inicializar o backend e o frontend do projeto.
 
-This starter repository provides a ready-to-use project template for building cross-platform desktop applications with Electron, React, TypeScript, and Tailwind CSS, utilizing Electron Forge for easy packaging and publishing.
+---
 
-## Features
+## Pré-requisitos
 
-- Electron for building cross-platform desktop applications
-- React for creating scalable, component-based UIs
-- TypeScript for strongly-typed and maintainable JavaScript code
-- Tailwind CSS for utility-first styling and rapid UI development
-- Electron Forge for simple packaging and publishing of Electron applications
+- Node.js (recomendado v18+)
+- pnpm ou npm
+- postgreSQL
 
-## Getting Started
+---
 
-Clone the repository:
+## 1. Instalando as dependências
 
-```bash
-git clone https://github.com/rostislavjadavan/electron-react-typescript-tailwind-starter.git
-```
-
-Navigate to the project folder:
+Na raiz do projeto, execute:
 
 ```bash
-cd electron-react-typescript-tailwind-starter
-```
-
-Install dependencies:
-
-```bash
+pnpm install
+# ou
 npm install
 ```
 
-Start the development server:
+---
 
-```bash
-npm run start
-```
+## 2. Inicializando o Backend
 
-# Package the project
+1. Acesse a pasta do backend:
+   ```bash
+   cd backend
+   ```
+2. Instale as dependências do backend:
+   ```bash
+   pnpm install
+   # ou
+   npm install
+   ```
+3. Configure o arquivo `.env`:
+   - Copie `.env.example` para `.env` e ajuste as variáveis conforme necessário.
 
-Package the project as an Electron app:
+   ```bash
+    cp .env.example .env
+   ```
+4. Execute as migrações do banco de dados (se necessário):
+   ```bash
+   pnpm migrate
+   # ou
+   npm run migrate
+   ```
+5. Inicie o servidor backend:
+   ```bash
+   pnpm dev
+   # ou
+   npm dev
+   ```
 
-```bash
-npm run make
-```
+---
 
-For detailed configuration visit: https://www.electronforge.io
+## 3. Inicializando o Frontend (Electron + React)
 
-## Customization
+1. Volte para a raiz do projeto (se estiver na pasta backend):
+   ```bash
+   cd ..
+   ```
+2. Inicie o aplicativo Electron:
+   ```bash
+   pnpm start
+   # ou
+   npm start
+   ```
 
-You can easily customize the project to suit your needs by modifying the source code within the `src` directory. The project is set up with a simple example that you can use as a starting point for your application.
+---
+
+## Estrutura do Projeto
+
+- `/backend`: Código do backend (Fastify, banco de dados, scripts)
+- `/src`: Código do frontend (Electron, React, Tailwind)
+
+---
+
+## Observações
+
+- Certifique-se de que o backend esteja rodando antes de utilizar funcionalidades que dependam da API.
+- Para empacotar o projeto Electron:
+  ```bash
+  pnpm make
+  # ou
+  npm run make
+  ```
+- Para configurações avançadas, consulte a documentação do Electron Forge, Fastify, React e Tailwind CSS.
+
