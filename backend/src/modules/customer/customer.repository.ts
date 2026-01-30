@@ -17,6 +17,7 @@ export interface Customer {
 export class CustomerRepository {
 
     async findWithFilters(options?: {
+        id?: string,
         name?: string,
         cpf?: string,
         cep?: string,
@@ -93,8 +94,14 @@ export class CustomerRepository {
         }
 
         if (options?.email) {
-            query += ` AND email = $${counter}`; // ILIKE aqui evita problemas com Maiúsculas/Minúsculas
+            query += ` AND email = $${counter}`;
             values.push(options.email);
+            counter++;
+        }
+
+        if (options?.id) {
+            query += ` AND id = $${counter}`;
+            values.push(options.id);
             counter++;
         }
 

@@ -34,7 +34,30 @@ export async function customerRoutes(app: FastifyInstance) {
         }
     });
 
-    app.put("/", async) => {
+    app.put("/:id", async (request, reply) => {
+        const { id } = request.params as { id: string };
+        const data = request.body as any;
 
-    };
+        try {
+            const updatedCustomer = await service.updateCustomer(Number(id), data);
+            return updatedCustomer;
+        } catch (err: any) {
+            reply.code(400);
+            return { message: err.message };
+        }
+    });
+
+    app.delete("/:id", async (request, reply) => {
+        const { id } = request.params as { id: string };
+
+        try {
+            await service.deleteCustomer(id);
+
+            // Status 204 significa "No Content" (Sucesso, mas não há nada para retornar no corpo)
+            return reply.code(204).send();
+        } catch (err: any) {
+            reply.code(400);
+            return { message: err.message };
+        }
+    });
 }

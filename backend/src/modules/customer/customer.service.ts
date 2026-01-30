@@ -62,14 +62,27 @@ export class CustomerService {
         const cleanPhone = data.phoneNumber.replace(/\D/g, "");
 
         // 2. Verifica se o cliente existe
-        const customer = await this.repository.findById(id);
-        if (!customer) throw new Error("Cliente não encontrado");
+        const customers = await this.repository.findWithFilters({ id: String(id) });
+        if (customers.length === 0) {
+            throw new Error("Cliente não encontrado");
+        }
 
         // 3. Validação de conflito (Opcional, mas seguro): 
-        // Verificar se o novo e-mail já existe em OUTRO ID
-        const emailExists = await this.repository.findByEmail(data.email);
-        if (emailExists && emailExists.id !== id) {
+
+        const emailExists = await this.repository.findWithFilters({ email: data.email });
+
+        if (emailExists.length > 0 && Number(emailExists[0].id) !== id) {
             throw new Error("Este e-mail já está sendo usado por outro cliente");
+        }
+
+        const cpfExists = await this.repository.findWithFilters({ cpf: cleanCpf });
+        if (cpfExists.length > 0 && Number(cpfExists[0].id) !== id) {
+            throw new Error("Este CPF já está sendo usado por outro cliente");
+        }
+
+        const phoneExists = await this.repository.findWithFilters({ phoneNumber: cleanPhone });
+        if (phoneExists.length > 0 && Number(phoneExists[0].id) !== id) {
+            throw new Error("Este telefone já está sendo usado por outro cliente");
         }
 
         return this.repository.update(id, {
@@ -81,6 +94,11 @@ export class CustomerService {
     }
 
     async deleteCustomer(id: string) {
+        const customer = await this.repository.findWithFilters({ id: String(id) });
+
+        if (customer.length === 0) {
+            throw new Error("Cliente não encontrado para exclusão");
+        }
         await this.repository.delete(id);
     }
 }
