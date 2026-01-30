@@ -93,7 +93,7 @@ export class CustomerRepository {
         }
 
         if (options?.email) {
-            query += ` AND email ILIKE $${counter}`; // ILIKE aqui evita problemas com Maiúsculas/Minúsculas
+            query += ` AND email = $${counter}`; // ILIKE aqui evita problemas com Maiúsculas/Minúsculas
             values.push(options.email);
             counter++;
         }
@@ -103,45 +103,6 @@ export class CustomerRepository {
         // 3. Executa a query
         const { rows } = await pool.query(query, values);
         return rows;
-    }
-
-    async findAll(): Promise<Customer[]> {
-        const { rows } = await pool.query(
-            `SELECT id, name, cpf, cep, street, neighborhood, state, street_number AS "streetNumber", phone_number AS "phoneNumber", email, created_at FROM customers`
-        );
-        return rows;
-    }
-
-    async findById(id: string): Promise<Customer | null> {
-        const { rows } = await pool.query(
-            `SELECT id, name, cpf, cep, street, neighborhood, state, street_number AS "streetNumber", phone_number AS "phoneNumber", email, created_at FROM customers WHERE id = $1`,
-            [id]
-        );
-        return rows[0] ?? null;
-    }
-
-    async findByEmail(email: string): Promise<Customer | null> {
-        const { rows } = await pool.query(
-            "SELECT id FROM customers WHERE email = $1",
-            [email]
-        );
-        return rows[0] ?? null;
-    }
-
-    async findByCPF(cpf: string): Promise<Customer | null> {
-        const { rows } = await pool.query(
-            "SELECT id FROM customers WHERE cpf = $1",
-            [cpf]
-        );
-        return rows[0] ?? null;
-    }
-
-    async findByPhoneNumber(phoneNumber: string): Promise<Customer | null> {
-        const { rows } = await pool.query(
-            "SELECT id FROM customers WHERE phone_number = $1",
-            [phoneNumber]
-        );
-        return rows[0] ?? null;
     }
 
     async create(data: Omit<Customer, 'id' | 'created_at'>): Promise<Customer> {
@@ -168,6 +129,35 @@ export class CustomerRepository {
         );
 
         return rows[0];
+    }
+
+    async update(id: number, data: Partial<Customer>): Promise<Customer | null> {
+        const { rows } = await pool.query(
+            `
+        UPDATE customers 
+        SET name = $1, cpf = $2, cep = $3, street = $4, neighborhood = $5, 
+            state = $6, street_number = $7, phone_number = $8, email = $9
+        WHERE id = $10
+        RETURNING id, name, cpf, cep, street, neighborhood, state, 
+                  street_number AS "streetNumber", 
+                  phone_number AS "phoneNumber", 
+                  email, created_at
+        `,
+            [
+                data.name,
+                data.cpf,
+                data.cep,
+                data.street,
+                data.neighborhood,
+                data.state,
+                data.streetNumber,
+                data.phoneNumber,
+                data.email,
+                id
+            ]
+        );
+
+        return rows[0] ?? null;
     }
 
     async delete(id: string): Promise<void> {

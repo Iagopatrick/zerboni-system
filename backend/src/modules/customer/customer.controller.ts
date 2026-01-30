@@ -4,8 +4,10 @@ import { CustomerService } from "./customer.service";
 export async function customerRoutes(app: FastifyInstance) {
     const service = new CustomerService();
 
-    app.get("/", async () => {
-        return service.listCustomers();
+    app.get("/", async (request, reply) => {
+        const filters = request.query as any; // Pega tudo o que vier após o "?" na URL
+        return service.listCustomers(filters);
+
     });
 
     app.post("/", async (request, reply) => {
@@ -31,4 +33,8 @@ export async function customerRoutes(app: FastifyInstance) {
             return { message: err.message };
         }
     });
+
+    app.put("/", async) => {
+
+    };
 }
