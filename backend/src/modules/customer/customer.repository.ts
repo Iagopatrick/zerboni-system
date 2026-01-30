@@ -15,19 +15,6 @@ export interface Customer {
 }
 
 export class CustomerRepository {
-    // async findWithFilters(options?: { cpf?: string, name?: string }) {
-    //     let query = `SELECT * FROM customers c WHERE deleted_at IS NULL`
-    //     if (!!options) {
-
-    //         if (options?.cpf) {
-    //             query += `and c.cpf = ${options.cpf}`
-    //         }
-    //         if (options?.name) {
-    //             query += `and c.name = ${options.name}`
-    //         }
-    //     }
-
-    // }
 
     async findWithFilters(options?: {
         name?: string,
