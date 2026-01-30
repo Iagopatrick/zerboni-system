@@ -17,3 +17,11 @@
     border-color: var(--color-gray-200, currentColor);
   }
 }
+
+@theme {
+  --color-primary: #0277A0;
+  --color-secondary: #E17800;
+  --font-inter: Inter, sans-serif;
+  --ice: #E9F0F2;
+  --color-bluePrimary: #E9F0F2;
+}

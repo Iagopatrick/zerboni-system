@@ -30,13 +30,16 @@
     "@typescript-eslint/eslint-plugin": "^8.28.0",
     "@typescript-eslint/parser": "^8.28.0",
     "@vercel/webpack-asset-relocator-loader": "1.7.3",
+    "autoprefixer": "^10.4.23",
     "css-loader": "^7.1.2",
     "electron": "^35.1.2",
     "eslint": "^9.23.0",
-    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-import-helpers": "^2.0.1",
     "node-loader": "^2.1.0",
     "postcss-loader": "^8.1.1",
     "style-loader": "^4.0.0",
+    "tailwindcss": "^4.1.18",
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
@@ -45,14 +48,11 @@
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.1.12",
-    "autoprefixer": "^10.4.21",
     "electron-squirrel-startup": "^1.0.1",
     "express": "^5.2.1",
     "fastify": "^5.7.2",
     "pg": "^8.17.2",
-    "postcss": "^8.5.3",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "tailwindcss": "^4.1.12"
+    "react-dom": "^19.1.0"
   }
 }

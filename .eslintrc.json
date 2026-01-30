@@ -12,5 +12,20 @@
     "plugin:import/electron",
     "plugin:import/typescript"
   ],
-  "parser": "@typescript-eslint/parser"
+  "parser": "@typescript-eslint/parser",
+  "rules": {
+  "import-helpers/order-imports": [
+    "warn",
+    {
+      "newlinesBetween": "always", // Pula linha entre grupos
+      "groups": [
+        "/^react/", // React primeiro
+        "module", // Bibliotecas
+        ["parent", "sibling", "index"], // Arquivos locais
+        "/^@components/" // Aliases (se usar)
+      ],
+      "alphabetize": { "order": "asc", "ignoreCase": true }
+    }
+  ]
+}
 }
