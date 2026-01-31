@@ -4,8 +4,13 @@ import { UserService } from "./user.service";
 export async function userRoutes(app: FastifyInstance) {
   const service = new UserService();
 
-  app.get("/", async () => {
-    return service.listUsers();
+  app.get("/", async (request, reply) => {
+    try {
+      return await service.listUsers();
+    } catch (err: any) {
+      reply.code(500);
+      return { message: err.message, status: "error" };
+    }
   });
 
   app.post("/", async (request, reply) => {

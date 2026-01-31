@@ -1,4 +1,5 @@
 import { app, BrowserWindow } from "electron";
+import "./icp.config"
 
 // Fix for Linux sandbox issues - must be before any app initialization
 if (process.platform === "linux") {

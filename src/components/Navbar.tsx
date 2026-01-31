@@ -27,7 +27,7 @@ const NavbarItem = ({
 }) => {
   return (
     <div
-      className={`flex items-center justify-start gap-[3.5px] py-3.5 px-6 w-full ${isActive ? "bg-secondary rounded-r-4xl shadow-xl/20" : ""}`}
+      className={`flex items-center max-w-[315px] self-start gap-[3.5px] py-3.5 px-6 w-full ${isActive ? "bg-secondary rounded-r-4xl shadow-xl/20" : ""}`}
       onClick={onClick}
     >
       <div className="flex items-center justify-center">{icon}</div>
@@ -42,8 +42,8 @@ const NavbarItem = ({
 
 export const Navbar = ({ tab, setTab }: NavbarProps) => {
   return (
-    <aside className="flex flex-col bg-white h-screen w-62.5  pr-6 py-4 rounded-r-lg shadow-xl/20 justify-between">
-      <div className="flex gap-[6.5px] items-center px-6">
+    <aside className="flex flex-col bg-white h-screen w-91  pr-9 py-4 rounded-r-lg shadow-xl/20 justify-between">
+      <div className="flex gap-[6.5px] py-5 max-w-[315px] items-center justify-center px-6">
         <div>
           <ZerboniIcon width={40} height={40} />
         </div>
@@ -55,7 +55,7 @@ export const Navbar = ({ tab, setTab }: NavbarProps) => {
         </div>
       </div>
       <nav
-        className={`h-full w-full bg-white flex items-center justify-center flex-col gap-3.75`}
+        className={`h-full w-full bg-white flex items-center justify-start flex-col gap-3.75`}
       >
         <NavbarItem
           label="Dashboard"
@@ -138,9 +138,8 @@ export const Navbar = ({ tab, setTab }: NavbarProps) => {
           }
         />
       </nav>
-      <div className="px-6 flex items-center justify-between">
+      <div className="px-6 flex items-center justify-between max-w-[315px]">
         <div>
-          {" "}
           <LogoutIcon width={33} height={33} color={"#666668"} />
         </div>
         <div className="flex items-center gap-1.25">
