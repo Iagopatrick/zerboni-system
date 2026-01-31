@@ -17,9 +17,9 @@ CREATE TABLE IF NOT EXISTS products (
   active BOOLEAN DEFAULT TRUE NOT NULL,
   size TEXT,
   supplier_cnpj CHAR(14) NOT NULL,
-  created_at TIMESTAMP DEFAULT now()
+  created_at TIMESTAMP DEFAULT now(),
 
-  CONSTRAINT fk_supplier FOREIGN KEY (supplier_cnpj) REFERENCES supplier(cnpj)
+  CONSTRAINT fk_supplier FOREIGN KEY (supplier_cnpj) REFERENCES suppliers(cnpj)
 );
 
 COMMIT;
