@@ -136,17 +136,48 @@ export class SupplierPaymentRepository {
     data: Partial<SupplierPayment>
   ): Promise<SupplierPayment | null> {
 
-    const { rows } = await pool.query(
-      `
+    const fields: string[] = [];
+    const values: any[] = [];
+    let counter = 1;
+
+    if (data.supplierId !== undefined) {
+      fields.push(`supplier_id = $${counter++}`);
+      values.push(data.supplierId);
+    }
+
+    if (data.paymentDate !== undefined) {
+      fields.push(`payment_date = $${counter++}`);
+      values.push(data.paymentDate);
+    }
+
+    if (data.amount !== undefined) {
+      fields.push(`amount = $${counter++}`);
+      values.push(data.amount);
+    }
+
+    if (data.paymentType !== undefined) {
+      fields.push(`payment_type = $${counter++}`);
+      values.push(data.paymentType);
+    }
+
+    if (data.movementType !== undefined) {
+      fields.push(`movement_type = $${counter++}`);
+      values.push(data.movementType);
+    }
+
+    if (data.description !== undefined) {
+      fields.push(`description = $${counter++}`);
+      values.push(data.description);
+    }
+
+    if (fields.length === 0) {
+      return null;
+    }
+
+    const query = `
       UPDATE supplier_payments
-      SET
-        supplier_id = $1,
-        payment_date = $2,
-        amount = $3,
-        payment_type = $4,
-        movement_type = $5,
-        description = $6
-      WHERE id = $7
+      SET ${fields.join(', ')}
+      WHERE id = $${counter}
       RETURNING
         id,
         supplier_id AS "supplierId",
@@ -156,18 +187,11 @@ export class SupplierPaymentRepository {
         movement_type AS "movementType",
         description,
         created_at
-      `,
-      [
-        data.supplierId,
-        data.paymentDate,
-        data.amount,
-        data.paymentType,
-        data.movementType,
-        data.description,
-        id
-      ]
-    );
+    `;
 
+    values.push(id);
+
+    const { rows } = await pool.query(query, values);
     return rows[0] ?? null;
   }
 
