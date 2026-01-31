@@ -91,6 +91,3 @@ out/
 # IDEs
 .vscode/
 .idea/
-
-# Tentando evitar criar conflitos
-package-lock.json
