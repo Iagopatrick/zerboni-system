@@ -34,7 +34,8 @@ export class SupplierRepository {
         id?: string,
         legalName?: string,
         city?: string,
-        cnpj?: string
+        cnpj?: string,
+        email?: string
     }): Promise<Supplier[]> {
 
         let query = `
@@ -70,6 +71,11 @@ export class SupplierRepository {
             values.push(options.cnpj.replace(/\D/g, ""));
             counter++;
         }
+        if (options?.email) {
+            query += ` AND email ILIKE $${counter}`;
+            values.push(`%${options.email}%`);
+            counter++;
+        }
 
         const { rows } = await pool.query(query, values);
         return rows;
@@ -84,8 +90,9 @@ export class SupplierRepository {
             state_tax_id, website, email, invoce_email, cash_account, tax_regime,
             payment_methods, notes
         )
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10 $11, $12, $13, $14, $15, 
-        $16, $17, $18, $19, $20, $21
+        VALUES (
+            $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, 
+            $16, $17, $18, $19, $20, $21
         )
         RETURNING id, legal_name AS "legalName", active, cep, street, 
             street_number AS "streetNumber", neighborhood, city, state, 
