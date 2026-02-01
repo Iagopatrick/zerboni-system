@@ -129,69 +129,159 @@ export class SupplierRepository {
         return rows[0];
     }
 
-    async update(id: number, data: Partial<Supplier>): Promise<Supplier | null> {
-        const { rows } = await pool.query(
-            `
-            UPDATE suppliers 
-            SET
-                legal_name = $1, 
-                active = $2, 
-                cep = $3, 
-                street = $4, 
-                street_number = $5, 
-                neighborhood = $6, 
-                city = $7, 
-                state = $8, 
-                phone_number = $9, 
-                fax = $10, 
-                cnpj = $11, 
-                producer_tax_id = $12, 
-                municipal_tax_id = $13, 
-                state_tax_id = $14, 
-                website = $15, 
-                email = $16, 
-                invoce_email = $17, 
-                cash_account = $18, 
-                tax_regime = $19, 
-                payment_methods = $20, 
-                notes = $21 
-            WHERE id = $22
-            RETURNING 
-                id, legal_name AS "legalName", active, cep, street, street_number AS "streetNumber", 
-                neighborhood, city, state, phone_number AS "phoneNumber", fax, cnpj, 
-                producer_tax_id AS "producerTaxId", municipal_tax_id AS "municipalTaxId", 
-                state_tax_id AS "stateTaxId", website, email, invoce_email AS "invoceEmail", 
-                cash_account AS "cashAccount", tax_regime AS "taxRegime", payment_methods AS "paymentMethods", 
-                notes, created_at
-            `,
-            [
-                data.legalName,
-                data.active,
-                data.cep,
-                data.street,
-                data.streetNumber,
-                data.neighborhood,
-                data.city,
-                data.state,
-                data.phoneNumber,
-                data.fax,
-                data.cnpj,
-                data.producerTaxId,
-                data.municipalTaxId,
-                data.stateTaxId,
-                data.website,
-                data.email,
-                data.invoceEmail,
-                data.cashAccount,
-                data.taxRegime,
-                data.paymentMethods,
-                data.notes,
-                id
-            ]
-        );
+    async update(
+        id: number,
+        data: Partial<Supplier>
+        ): Promise<Supplier | null> {
 
+        const fields: string[] = [];
+        const values: any[] = [];
+        let counter = 1;
+
+        if (data.legalName !== undefined) {
+        fields.push(`legal_name = $${counter++}`);
+        values.push(data.legalName);
+        }
+
+        if (data.active !== undefined) {
+        fields.push(`active = $${counter++}`);
+        values.push(data.active);
+        }
+
+        if (data.cep !== undefined) {
+        fields.push(`cep = $${counter++}`);
+        values.push(data.cep);
+        }
+
+        if (data.street !== undefined) {
+        fields.push(`street = $${counter++}`);
+        values.push(data.street);
+        }
+
+        if (data.streetNumber !== undefined) {
+        fields.push(`street_number = $${counter++}`);
+        values.push(data.streetNumber);
+        }
+
+        if (data.neighborhood !== undefined) {
+        fields.push(`neighborhood = $${counter++}`);
+        values.push(data.neighborhood);
+        }
+
+        if (data.city !== undefined) {
+        fields.push(`city = $${counter++}`);
+        values.push(data.city);
+        }
+
+        if (data.state !== undefined) {
+        fields.push(`state = $${counter++}`);
+        values.push(data.state);
+        }
+
+        if (data.phoneNumber !== undefined) {
+        fields.push(`phone_number = $${counter++}`);
+        values.push(data.phoneNumber);
+        }
+
+        if (data.fax !== undefined) {
+        fields.push(`fax = $${counter++}`);
+        values.push(data.fax);
+        }
+
+        if (data.cnpj !== undefined) {
+        fields.push(`cnpj = $${counter++}`);
+        values.push(data.cnpj);
+        }
+
+        if (data.producerTaxId !== undefined) {
+        fields.push(`producer_tax_id = $${counter++}`);
+        values.push(data.producerTaxId);
+        }
+
+        if (data.municipalTaxId !== undefined) {
+        fields.push(`municipal_tax_id = $${counter++}`);
+        values.push(data.municipalTaxId);
+        }
+
+        if (data.stateTaxId !== undefined) {
+        fields.push(`state_tax_id = $${counter++}`);
+        values.push(data.stateTaxId);
+        }
+
+        if (data.website !== undefined) {
+        fields.push(`website = $${counter++}`);
+        values.push(data.website);
+        }
+
+        if (data.email !== undefined) {
+        fields.push(`email = $${counter++}`);
+        values.push(data.email);
+        }
+
+        if (data.invoceEmail !== undefined) {
+        fields.push(`invoce_email = $${counter++}`);
+        values.push(data.invoceEmail);
+        }
+
+        if (data.cashAccount !== undefined) {
+        fields.push(`cash_account = $${counter++}`);
+        values.push(data.cashAccount);
+        }
+
+        if (data.taxRegime !== undefined) {
+        fields.push(`tax_regime = $${counter++}`);
+        values.push(data.taxRegime);
+        }
+
+        if (data.paymentMethods !== undefined) {
+        fields.push(`payment_methods = $${counter++}`);
+        values.push(data.paymentMethods);
+        }
+
+        if (data.notes !== undefined) {
+        fields.push(`notes = $${counter++}`);
+        values.push(data.notes);
+        }
+
+        if (fields.length === 0) {
+        return null;
+        }
+
+        const query = `
+        UPDATE suppliers
+        SET ${fields.join(', ')}
+        WHERE id = $${counter}
+        RETURNING
+            id,
+            legal_name AS "legalName",
+            active,
+            cep,
+            street,
+            street_number AS "streetNumber",
+            neighborhood,
+            city,
+            state,
+            phone_number AS "phoneNumber",
+            fax,
+            cnpj,
+            producer_tax_id AS "producerTaxId",
+            municipal_tax_id AS "municipalTaxId",
+            state_tax_id AS "stateTaxId",
+            website,
+            email,
+            invoce_email AS "invoceEmail",
+            cash_account AS "cashAccount",
+            tax_regime AS "taxRegime",
+            payment_methods AS "paymentMethods",
+            notes,
+            created_at
+        `;
+
+        values.push(id);
+
+        const { rows } = await pool.query(query, values);
         return rows[0] ?? null;
-    }
+        }
 
     async delete(id: string): Promise<void> {
         await pool.query("DELETE FROM suppliers WHERE id = $1", [id]);
