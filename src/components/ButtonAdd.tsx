@@ -3,9 +3,10 @@ import { colors } from "../constans/colors";
 
 export const ButtonAdd: React.FC<
   React.ButtonHTMLAttributes<HTMLButtonElement>
-> = ({ children, className = "", ...props }) => {
+> = ({ children, className = "", onClick = () => {}, ...props }) => {
   return (
     <Button
+      onClick={onClick}  
       sx={{
         backgroundColor: "white",
         flex: "flex",

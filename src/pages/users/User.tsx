@@ -7,90 +7,132 @@ import { title } from "process";
 import { ActionButtons } from "../../components/ActionButtons";
 import { CreateUserModal } from "./components/CreateUserModal";
 import { ButtonAdd } from "../../components/ButtonAdd";
+import { DeleteUserModal } from "./components/DeleteUserModal";
 
-export const Userpage = () => {
-  const [users, setUsers] = useState([]);
-  const [openModal, setOpenModal] = useState(false);
+interface UserPageProps {
+  onCreate: () => void;
+  onView: (id: number) => void;
+  onEdit: (id: number) => void;
+}
+
+export const Userpage = ({ onCreate, onView, onEdit }: UserPageProps) => {
+  const [users, setUsers] = useState<UserType[]>([]);
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalUsers, setTotalUsers] = useState(0);
+  const [search, setSearch] = useState("");
+  
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<number>(null);
+  
+  async function loadUsers() {
+    const { rows, total, page: currentPage, limit, totalPages } = await window.api.getUsers({
+      search,
+      page,
+      limit: rowsPerPage,
+    });
+
+    setUsers(rows);
+    setTotalUsers(total);
+    setPage(currentPage);
+    setRowsPerPage(limit);
+    setTotalPages(totalPages);
+  }
   useEffect(() => {
-    async function loadUsers() {
-      // const users = await window.api.getUsers();
-      // setUsers(users);
-    }
+    loadUsers();
+  }, [search, page, rowsPerPage]);
+
+  function openDeleteModal(userId: number) {
+    setUserToDelete(userId);
+    setDeleteModalOpen(true);
+  }
+
+  async function confirmDelete() {
+    if (!userToDelete) return;
+
+    await window.api.deleteUsers(userToDelete);
+
+    setDeleteModalOpen(false);
+    setUserToDelete(null);
 
     loadUsers();
-  }, []);
-  // Example columns and data (replace with real data from API)
-  const exampleColumns = [
+  }
+
+  const columns = [
     {
       key: "name",
       title: "Nome",
-      render: (r: any) => <p className="font-bold p-2 min-w-30">{r.name}</p>,
+      render: (r: UserType) => (
+        <p className="font-bold p-2 min-w-30">{r.name}</p>
+      ),
     },
-    { key: "email", title: "E-mail" },
+    {
+      key: "email",
+      title: "E-mail",
+      render: (r: UserType) => r.email || "-",
+    },
     {
       key: "created_at",
       title: "Criado em",
-      render: (r: any) =>
-        r.created_at ? new Date(r.created_at).toLocaleString() : "-",
+      render: (r: UserType) =>
+        r.created_at
+          ? new Date(r.created_at).toLocaleString()
+          : "-",
     },
     {
       key: "update",
       title: "Ação",
-      render: (r: any) => <ActionButtons />,
-    },
-  ];
-
-  const exampleData = [
-    {
-      id: "1",
-      name: "Alice Silva",
-      email: "alice@example.com",
-      created_at: new Date().toISOString(),
-    },
-    {
-      id: "2",
-      name: "Bruno Costa",
-      email: "",
-      created_at: new Date().toISOString(),
-    },
-    {
-      id: "3",
-      name: "Carla Souza",
-      email: "carla@example.com",
-      created_at: new Date().toISOString(),
-    },
-  ];
-
-  const filterOptions = [
-    { label: "Com e-mail", value: "has_email" },
-    { label: "Sem e-mail", value: "no_email" },
+      render: (r: UserType) => (
+        <ActionButtons
+          onInfo={() => onView(Number(r.id))}
+          onEdit={() => onEdit(Number(r.id))}
+          onRemove={() => openDeleteModal(Number(r.id))}
+        />
+      ),
+    }
   ];
 
   return (
-    <div className="pt-10">
-      <CreateUserModal open={openModal} onClose={() => setOpenModal(false)} />
+    <div className="pt-10 w-full">
+      <DeleteUserModal
+        open={deleteModalOpen}
+        onClose={() => {
+          setDeleteModalOpen(false);
+          setUserToDelete(null);
+        }}
+        onConfirm={confirmDelete}
+      />
       <div className="flex flex-col items-center px-8">
         <div className="flex gap-10 w-full mb-4">
           <SearchBar
+          className="w-full"
             placeholder="Buscar usuários..."
-            value={""}
-            onChange={() => void 0}
+            value={search}
+            onChange={(value) => setSearch(value)}
           />
           <ButtonAdd
-            onClick={() => setOpenModal(true)}
+            onClick={onCreate}
             className="bg-blue-600 text-white px-4 py-2 rounded"
           >
             Adicionar Usuário
           </ButtonAdd>
         </div>
 
-        <GenericTable columns={exampleColumns} data={exampleData} />
+        <GenericTable 
+          columns={columns}
+          data={users}
+          page={page}
+          totalPages={totalPages}
+          totalUsers={totalUsers}
+          rowsPerPage={rowsPerPage}
+          onPageChange={(newPage) => setPage(newPage)}
+          onRowsPerPageChange={(newLimit) => {
+                                setRowsPerPage(newLimit);
+                                setPage(1);
+                              }}
+        />
       </div>
-      <ul>
-        {users?.map((user: any) => (
-          <li key={user.id}>{user.name}</li>
-        ))}
-      </ul>
     </div>
   );
 };
