@@ -44,6 +44,36 @@ export class UserRepository {
     return rows[0];
   }
 
+  async update(id: string, data: { name?: string; email?: string }): Promise<User | null> {
+    const fields = [];
+    const values: any[] = [];
+    let counter = 1;
+
+    if (data.name !== undefined) {
+      fields.push(`name = $${counter}`);
+      values.push(data.name);
+      counter++;
+    }
+    if (data.email !== undefined) {
+      fields.push(`email = $${counter}`);
+      values.push(data.email);
+      counter++;
+    }
+
+    if (fields.length === 0) return this.findById(id); // nada para atualizar
+
+    values.push(id); // último parâmetro é o ID
+    const query = `
+      UPDATE users
+      SET ${fields.join(", ")}
+      WHERE id = $${counter}
+      RETURNING id, name, email, created_at
+    `;
+    const { rows } = await pool.query(query, values);
+    return rows[0] ?? null;
+  }
+
+
   async delete(id: string): Promise<void> {
     await pool.query("DELETE FROM users WHERE id = $1", [id]);
   }

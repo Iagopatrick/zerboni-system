@@ -28,4 +28,31 @@ export async function userRoutes(app: FastifyInstance) {
       return { message: err.message };
     }
   });
+
+  app.put("/:id", async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const data = request.body as { name?: string; email?: string };
+
+    try {
+      const updatedUser = await service.updateUser(id, data);
+      return updatedUser;
+    } catch (err: any) {
+      reply.code(400);
+      return { message: err.message };
+    }
+  });
+
+  // Deletar usuário
+  app.delete("/:id", async (request, reply) => {
+    const { id } = request.params as { id: string };
+
+    try {
+      await service.deleteUser(id);
+      reply.code(204);
+      return {};
+    } catch (err: any) {
+      reply.code(400);
+      return { message: err.message };
+    }
+  });
 }

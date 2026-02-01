@@ -7,90 +7,118 @@ import { title } from "process";
 import { ActionButtons } from "../../components/ActionButtons";
 import { CreateUserModal } from "./components/CreateUserModal";
 import { ButtonAdd } from "../../components/ButtonAdd";
+import { DeleteUserModal } from "./components/DeleteUserModal";
 
-export const Userpage = () => {
-  const [users, setUsers] = useState([]);
-  const [openModal, setOpenModal] = useState(false);
+interface UserPageProps {
+  onCreate: () => void;
+  onView: (id: number) => void;
+  onEdit: (id: number) => void;
+}
+
+export const Userpage = ({ onCreate, onView, onEdit }: UserPageProps) => {
+  const [users, setUsers] = useState<UserType[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<UserType[]>([]);
+  const [search, setSearch] = useState("");
+  
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<number>(null);
+  
+  async function loadUsers() {
+    const data = await window.api.getUsers();
+    setUsers(data);
+    setFilteredUsers(data);
+  }
+
   useEffect(() => {
-    async function loadUsers() {
-      // const users = await window.api.getUsers();
-      // setUsers(users);
-    }
-
     loadUsers();
   }, []);
-  // Example columns and data (replace with real data from API)
-  const exampleColumns = [
+
+  useEffect(() => {
+    const filtered = users.filter(user =>
+      user.name.toLowerCase().includes(search.toLowerCase()) ||
+      user.email.toLowerCase().includes(search.toLowerCase())
+    );
+    setFilteredUsers(filtered);
+  }, [search, users]);
+
+  function openDeleteModal(userId: number) {
+    setUserToDelete(userId);
+    setDeleteModalOpen(true);
+  }
+
+  async function confirmDelete() {
+    if (!userToDelete) return;
+
+    await window.api.deleteUsers(userToDelete);
+
+    setDeleteModalOpen(false);
+    setUserToDelete(null);
+
+    loadUsers();
+  }
+
+  const columns = [
     {
       key: "name",
       title: "Nome",
-      render: (r: any) => <p className="font-bold p-2 min-w-30">{r.name}</p>,
+      render: (r: UserType) => (
+        <p className="font-bold p-2 min-w-30">{r.name}</p>
+      ),
     },
-    { key: "email", title: "E-mail" },
+    {
+      key: "email",
+      title: "E-mail",
+      render: (r: UserType) => r.email || "-",
+    },
     {
       key: "created_at",
       title: "Criado em",
-      render: (r: any) =>
-        r.created_at ? new Date(r.created_at).toLocaleString() : "-",
+      render: (r: UserType) =>
+        r.created_at
+          ? new Date(r.created_at).toLocaleString()
+          : "-",
     },
     {
       key: "update",
       title: "Ação",
-      render: (r: any) => <ActionButtons />,
-    },
-  ];
-
-  const exampleData = [
-    {
-      id: "1",
-      name: "Alice Silva",
-      email: "alice@example.com",
-      created_at: new Date().toISOString(),
-    },
-    {
-      id: "2",
-      name: "Bruno Costa",
-      email: "",
-      created_at: new Date().toISOString(),
-    },
-    {
-      id: "3",
-      name: "Carla Souza",
-      email: "carla@example.com",
-      created_at: new Date().toISOString(),
-    },
-  ];
-
-  const filterOptions = [
-    { label: "Com e-mail", value: "has_email" },
-    { label: "Sem e-mail", value: "no_email" },
+      render: (r: UserType) => (
+        <ActionButtons
+          onInfo={() => onView(Number(r.id))}
+          onEdit={() => onEdit(Number(r.id))}
+          onRemove={() => openDeleteModal(Number(r.id))}
+        />
+      ),
+    }
   ];
 
   return (
-    <div className="pt-10">
-      <CreateUserModal open={openModal} onClose={() => setOpenModal(false)} />
+    <div className="pt-10 w-full">
+      <DeleteUserModal
+        open={deleteModalOpen}
+        onClose={() => {
+          setDeleteModalOpen(false);
+          setUserToDelete(null);
+        }}
+        onConfirm={confirmDelete}
+      />
       <div className="flex flex-col items-center px-8">
         <div className="flex gap-10 w-full mb-4">
           <SearchBar
+          className="w-full"
             placeholder="Buscar usuários..."
-            value={""}
-            onChange={() => void 0}
+            value={search}
+            onChange={(value) => setSearch(value)}
           />
           <ButtonAdd
-            onClick={() => setOpenModal(true)}
+            onClick={onCreate}
             className="bg-blue-600 text-white px-4 py-2 rounded"
           >
             Adicionar Usuário
           </ButtonAdd>
         </div>
 
-        <GenericTable columns={exampleColumns} data={exampleData} />
+        <GenericTable columns={columns} data={filteredUsers} />
       </div>
-      <ul>
-        {users?.map((user: any) => (
-          <li key={user.id}>{user.name}</li>
-        ))}
-      </ul>
     </div>
   );
 };

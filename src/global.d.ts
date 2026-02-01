@@ -1,4 +1,4 @@
-export {};
+export { };
 
 declare module "*.jpg" {
   const src: string;
@@ -24,6 +24,21 @@ declare global {
   interface Window {
     api: {
       getUsers: () => Promise<any>;
+
+      createUsers: (data: {
+        name: string;
+        email: string;
+      }) => Promise<any>;
+
+      updateUsers: (
+        id: number,
+        data: {
+          name?: string;
+          email?: string;
+        }
+      ) => Promise<any>;
+
+      deleteUsers: (id: number) => Promise<void>;
     };
   }
 }

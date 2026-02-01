@@ -14,8 +14,7 @@ export const SearchBar: React.FC<Props> = ({
   className = "",
 }) => {
   return (
-    <div className={`mb-4  ${className}`}>
-      <div className="flex shadow-xl/10 items-center w-100 bg-white  border-2 border-secondary rounded-xl px-2.5 py-1.5">
+      <div className={`flex shadow-xl/10 items-center w-100 bg-white  border-2 border-secondary rounded-xl px-2.5 py-1.5 mb-4  ${className}`}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           className="h-5 w-5 text-secondary"
@@ -50,7 +49,6 @@ export const SearchBar: React.FC<Props> = ({
           </button>
         ) : null}
       </div>
-    </div>
   );
 };
 
