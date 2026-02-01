@@ -7,12 +7,73 @@ export interface User {
   created_at: Date;
 }
 
+interface FindAllParams {
+  search?: string;
+  page?: number;
+  limit?: number;
+}
+
+interface PaginatedResult<T> {
+  rows: T[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
 export class UserRepository {
-  async findAll(): Promise<User[]> {
-    const { rows } = await pool.query(
-      "SELECT id, name, email, created_at FROM users"
-    );
-    return rows;
+  async findAll({ search = "", page = 1, limit = 10 }: FindAllParams) {
+    let offset: number;
+
+    // Query de contagem para saber total de registros
+    const countQuery = search
+      ? `SELECT COUNT(*) AS total FROM users WHERE name ILIKE $1 OR email ILIKE $1`
+      : `SELECT COUNT(*) AS total FROM users`;
+
+    const countValues = search ? [`%${search}%`] : [];
+    const countResult = await pool.query(countQuery, countValues);
+    const total = parseInt(countResult.rows[0].total, 10);
+
+    // Calcula total de páginas
+    const totalPages = Math.max(1, Math.ceil(total / limit));
+
+    // Garante que a página solicitada não ultrapasse o total
+    const safePage = Math.min(page, totalPages);
+
+    offset = (safePage - 1) * limit;
+
+    // Query de dados
+    let dataQuery: string;
+    let dataValues: any[];
+
+    if (search) {
+      dataQuery = `
+        SELECT id, name, email, created_at
+        FROM users
+        WHERE name ILIKE $1 OR email ILIKE $1
+        ORDER BY created_at DESC
+        LIMIT $2 OFFSET $3
+      `;
+      dataValues = [`%${search}%`, limit, offset];
+    } else {
+      dataQuery = `
+        SELECT id, name, email, created_at
+        FROM users
+        ORDER BY created_at DESC
+        LIMIT $1 OFFSET $2
+      `;
+      dataValues = [limit, offset];
+    }
+
+    const dataResult = await pool.query(dataQuery, dataValues);
+
+    return {
+      rows: dataResult.rows,
+      total,
+      page: safePage,
+      limit,
+      totalPages,
+    };
   }
 
   async findById(id: string): Promise<User | null> {

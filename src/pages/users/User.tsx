@@ -17,29 +17,31 @@ interface UserPageProps {
 
 export const Userpage = ({ onCreate, onView, onEdit }: UserPageProps) => {
   const [users, setUsers] = useState<UserType[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<UserType[]>([]);
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalUsers, setTotalUsers] = useState(0);
   const [search, setSearch] = useState("");
   
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<number>(null);
   
   async function loadUsers() {
-    const data = await window.api.getUsers();
-    setUsers(data);
-    setFilteredUsers(data);
-  }
+    const { rows, total, page: currentPage, limit, totalPages } = await window.api.getUsers({
+      search,
+      page,
+      limit: rowsPerPage,
+    });
 
+    setUsers(rows);
+    setTotalUsers(total);
+    setPage(currentPage);
+    setRowsPerPage(limit);
+    setTotalPages(totalPages);
+  }
   useEffect(() => {
     loadUsers();
-  }, []);
-
-  useEffect(() => {
-    const filtered = users.filter(user =>
-      user.name.toLowerCase().includes(search.toLowerCase()) ||
-      user.email.toLowerCase().includes(search.toLowerCase())
-    );
-    setFilteredUsers(filtered);
-  }, [search, users]);
+  }, [search, page, rowsPerPage]);
 
   function openDeleteModal(userId: number) {
     setUserToDelete(userId);
@@ -117,7 +119,19 @@ export const Userpage = ({ onCreate, onView, onEdit }: UserPageProps) => {
           </ButtonAdd>
         </div>
 
-        <GenericTable columns={columns} data={filteredUsers} />
+        <GenericTable 
+          columns={columns}
+          data={users}
+          page={page}
+          totalPages={totalPages}
+          totalUsers={totalUsers}
+          rowsPerPage={rowsPerPage}
+          onPageChange={(newPage) => setPage(newPage)}
+          onRowsPerPageChange={(newLimit) => {
+                                setRowsPerPage(newLimit);
+                                setPage(1);
+                              }}
+        />
       </div>
     </div>
   );

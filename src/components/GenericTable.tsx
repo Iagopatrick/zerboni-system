@@ -11,7 +11,7 @@ import {
   Typography,
 } from "@mui/material";
 import React from "react";
-import { ArrowIcon } from "../assets/icons/ArrowIcon";
+import { colors } from "../constans/colors";
 
 type Column<T = any> = {
   key: string;
@@ -22,10 +22,16 @@ type Column<T = any> = {
 type Props<T = any> = {
   columns: Column<T>[];
   data: T[];
+  page: number;
+  totalPages: number;
+  totalUsers: number;
+  rowsPerPage: number;
+  onPageChange?: (newPage: number) => void;
+  onRowsPerPageChange?: (newRowsPerPage: number) => void;
   onRowClick?: (row: T) => void;
 };
 
-export function GenericTable<T>({ columns, data, onRowClick }: Props<T>) {
+export function GenericTable<T>({ columns, data, page, totalPages, totalUsers, rowsPerPage, onPageChange, onRowsPerPageChange, onRowClick }: Props<T>) {
   return (
     <TableContainer
       component={Paper}
@@ -37,15 +43,16 @@ export function GenericTable<T>({ columns, data, onRowClick }: Props<T>) {
             {columns.map((col) => (
               <TableCell
                 key={col.key}
-                className="py-2 text-sm text-gray-700 items-center flex"
+                sx={{
+                  py: 1.5,
+                  px: 1.5,
+                  textAlign: "center",
+                  fontWeight: 700,
+                  fontSize: "14px",
+                  color: "#374151",
+                }}
               >
-                <Typography
-                  fontWeight={700}
-                  fontSize="12px"
-                  textAlign={"center"}
-                >
-                  {col.title}
-                </Typography>
+                {col.title}
               </TableCell>
             ))}
           </TableRow>
@@ -63,7 +70,7 @@ export function GenericTable<T>({ columns, data, onRowClick }: Props<T>) {
                   key={col.key}
                   sx={{
                     border: "none",
-                    alignItems: "center",
+                    justifyItems: "center",
                     textAlign: "center",
                   }}
                 >
@@ -76,18 +83,70 @@ export function GenericTable<T>({ columns, data, onRowClick }: Props<T>) {
         <TableFooter>
           <TableRow>
             <TableCell colSpan={columns.length} align="center">
-              <div className="flex items-center justify-center gap-4 text-secondary">
-                <button className="p-1 rounded hover:bg-orange-100">
-                  <ArrowIcon width={18} height={18} />
-                </button>
-
-                <Typography fontWeight={700} fontSize="12px">
-                  10 de 10
-                </Typography>
-
-                <button className="p-1 rounded hover:bg-orange-100 rotate-180">
-                  <ArrowIcon width={18} height={18} />
-                </button>
+              <div className="flex items-center justify-center gap-4">
+              <Pagination
+                count={totalPages}
+                page={page}
+                onChange={(_, value) => onPageChange && onPageChange(value)}
+                color="primary"
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: 1,
+                  "& .MuiPaginationItem-root": {
+                    color: "#ffffff",
+                    backgroundColor: colors.secondary,
+                    borderRadius: "8px",
+                    border: `1px solid ${colors.secondary}`,
+                    "&:hover": {
+                      backgroundColor: colors.secondary,
+                      borderColor: colors.secondary,
+                      opacity: 0.5
+                    },
+                    "&.Mui-selected": {
+                      backgroundColor: colors.selected,
+                      borderColor: colors.selected,
+                      color: colors.primary,
+                      "&:hover": {
+                        backgroundColor: colors.selected,
+                        borderColor: colors.selected,
+                        opacity: 1, 
+                      },
+                    },
+                  },
+                }}
+              />
+              <div className="flex items-center gap-2">
+                <select
+                  value={rowsPerPage}
+                  onChange={(e) => onRowsPerPageChange && onRowsPerPageChange(Number(e.target.value))}
+                  className="border px-2 py-1 text-sm"
+                  style={{
+                    borderRadius: "8px",
+                    height: 36,
+                    lineHeight: "36px",
+                    backgroundColor: "#f97316",
+                    color: "#ffffff",
+                    borderColor: "#f97316",
+                    fontWeight: 600,
+                    cursor: "pointer",
+                  }}
+                >
+                  {[10, 20, 30, 40, 50].map((n) => (
+                    <option key={n} value={n}>
+                      {n}
+                    </option>
+                  ))}
+                </select>
+                <span
+                  className="text-sm font-medium text-gray-700"
+                  style={{ lineHeight: "36px" }}
+                >
+                  de {totalUsers}
+                </span>
+              </div>
+              
               </div>
             </TableCell>
           </TableRow>

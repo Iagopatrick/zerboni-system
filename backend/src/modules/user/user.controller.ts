@@ -6,7 +6,12 @@ export async function userRoutes(app: FastifyInstance) {
 
   app.get("/", async (request, reply) => {
     try {
-      return await service.listUsers();
+      const { search = "", page = "1", limit = "10" } = request.query as any;
+      const pageNum = parseInt(page, 10);
+      const limitNum = parseInt(limit, 10);
+
+      const result = await service.listUsers({ search, page: pageNum, limit: limitNum });
+      return result;
     } catch (err: any) {
       reply.code(500);
       return { message: err.message, status: "error" };

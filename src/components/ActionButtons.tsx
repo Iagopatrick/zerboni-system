@@ -17,7 +17,7 @@ export const ActionButtons = (props: ActionButtonsProps) => {
     <div className="flex gap-2 items-center">
       <IconButton aria-label="delete">
         <Typography
-          sx={{ fontSize: "16px", borderRadius: "50%", color: colors.primary }}
+          sx={{ fontSize: "16px", borderRadius: "50%", color: colors.secondary }}
           onClick={() => onInfo?.()}
         >
           <FaInfo />
@@ -25,7 +25,7 @@ export const ActionButtons = (props: ActionButtonsProps) => {
       </IconButton>
       <IconButton aria-label="delete">
         <Typography
-          sx={{ fontSize: "16px", borderRadius: "50%", color: colors.primary }}
+          sx={{ fontSize: "16px", borderRadius: "50%", color: colors.secondary }}
           onClick={() => onEdit?.()}
         >
           <FaEdit />
@@ -33,7 +33,7 @@ export const ActionButtons = (props: ActionButtonsProps) => {
       </IconButton>
       <IconButton aria-label="delete">
         <Typography
-          sx={{ fontSize: "16px", borderRadius: "50%", color: colors.primary }}
+          sx={{ fontSize: "16px", borderRadius: "50%", color: colors.secondary }}
           onClick={() => onRemove?.()}
         >
           <FaTrash />

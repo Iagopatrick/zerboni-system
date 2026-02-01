@@ -20,10 +20,24 @@ declare module "*.svg" {
   export default src;
 }
 
+interface GetUsersParams {
+  search?: string;
+  page?: number;
+  limit?: number;
+}
+
+interface GetUsersResponse {
+  rows: UserType[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
 declare global {
   interface Window {
     api: {
-      getUsers: () => Promise<any>;
+      getUsers: (params?: GetUsersParams) => Promise<GetUsersResponse>;
 
       createUsers: (data: {
         name: string;

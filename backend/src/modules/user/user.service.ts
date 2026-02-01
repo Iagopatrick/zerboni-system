@@ -1,10 +1,15 @@
 import { UserRepository } from "./user.repository";
 
+interface ListUsersParams {
+  search?: string;
+  page?: number;
+  limit?: number;
+}
 export class UserService {
   private repository = new UserRepository();
 
-  async listUsers() {
-    return this.repository.findAll();
+  async listUsers({ search = "", page = 1, limit = 10 }: ListUsersParams) {
+    return this.repository.findAll({ search, page, limit });
   }
 
   async createUser(data: { name: string; email: string }) {

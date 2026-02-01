@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "../../../components/Button";
 import { Input } from "../../../components/Input";
-import { FaArrowLeft } from "react-icons/fa";
+import { FaArrowLeft, FaUserCheck, FaUserEdit, FaUserPlus } from "react-icons/fa";
 
 interface UserFormPageProps {
   mode: "create" | "view" | "edit";
@@ -20,7 +20,7 @@ export const UserFormPage = ({ mode, userId, onBack }: UserFormPageProps) => {
       async function loadUser() {
         try {
           const users = await window.api.getUsers();
-          const user = users.find((u: { id: number; }) => u.id === userId);
+          const user = users.rows.find((u: { id: number; }) => u.id === userId);
           if (user) {
             setName(user.name);
             setEmail(user.email);
@@ -62,10 +62,10 @@ export const UserFormPage = ({ mode, userId, onBack }: UserFormPageProps) => {
         >
           <FaArrowLeft/>
         </Button>
-        <h1 className="text-xl font-bold pl-6">
-          {mode === "create" && "Criar Usuário"}
-          {mode === "view" && "Visualizar Usuário"}
-          {mode === "edit" && "Editar Usuário"}
+        <h1 className="flex items-center text-xl font-bold pl-6 gap-2">
+          {mode === "create" && <><FaUserPlus />Criar Usuário</>}
+          {mode === "view" && <><FaUserCheck />Visualizar Usuário</>}
+          {mode === "edit" && <><FaUserEdit />Editar Usuário</>}
         </h1>
       </div>
 
@@ -91,7 +91,7 @@ export const UserFormPage = ({ mode, userId, onBack }: UserFormPageProps) => {
             placeholder="Email"
             disabled={mode === "view"}
             value={email}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => setEmail(e.target.value)}
           />
         </div>
         <div className="flex justify-end w-full">
