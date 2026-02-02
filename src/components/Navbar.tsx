@@ -64,8 +64,8 @@ export const Navbar = ({ tab, setTab }: NavbarProps) => {
           onClick={() => setTab && setTab(TabsEnum.DASHBOARD)}
           icon={
             <HomeIcon
-              width={33}
-              height={33}
+              width={30}
+              height={30}
               color={
                 tab === TabsEnum.DASHBOARD ? colors.selected : colors.primary
               }
@@ -92,8 +92,8 @@ export const Navbar = ({ tab, setTab }: NavbarProps) => {
           onClick={() => setTab && setTab(TabsEnum.STOCK)}
           icon={
             <BoxIcon
-              width={40}
-              height={40}
+              width={33}
+              height={33}
               color={tab === TabsEnum.STOCK ? colors.selected : colors.primary}
             />
           }
