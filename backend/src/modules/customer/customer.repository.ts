@@ -14,7 +14,83 @@ export interface Customer {
     created_at: Date;
 }
 
+interface FindAllCustomersParams {
+    search?: string;
+    page?: number;
+    limit?: number;
+}
+
 export class CustomerRepository {
+
+    async findAll({
+        search = "",
+        page = 1,
+        limit = 10,
+    }: FindAllCustomersParams) {
+        const offset = (page - 1) * limit;
+
+        // 1️⃣ Contagem total de registros
+        const countQuery = search
+            ? `
+      SELECT COUNT(*) AS total
+      FROM customers
+      WHERE name ILIKE $1 OR email ILIKE $1 OR cpf ILIKE $1
+    `
+            : `
+      SELECT COUNT(*) AS total
+      FROM customers
+    `;
+
+        const countValues = search ? [`%${search}%`] : [];
+        const countResult = await pool.query(countQuery, countValues);
+        const total = parseInt(countResult.rows[0].total, 10);
+
+        // 2️⃣ Calcula total de páginas
+        const totalPages = Math.max(1, Math.ceil(total / limit));
+
+        // 3️⃣ Garante página segura
+        const safePage = Math.min(page, totalPages);
+        const safeOffset = (safePage - 1) * limit;
+
+        // 4️⃣ Query de dados
+        let dataQuery: string;
+        let dataValues: any[];
+
+        if (search) {
+            dataQuery = `
+      SELECT id, name, cpf, cep, street, neighborhood, state,
+             street_number AS "streetNumber",
+             phone_number AS "phoneNumber",
+             email, created_at
+      FROM customers
+      WHERE name ILIKE $1 OR email ILIKE $1 OR cpf ILIKE $1
+      ORDER BY created_at DESC
+      LIMIT $2 OFFSET $3
+    `;
+            dataValues = [`%${search}%`, limit, safeOffset];
+        } else {
+            dataQuery = `
+      SELECT id, name, cpf, cep, street, neighborhood, state,
+             street_number AS "streetNumber",
+             phone_number AS "phoneNumber",
+             email, created_at
+      FROM customers
+      ORDER BY created_at DESC
+      LIMIT $1 OFFSET $2
+    `;
+            dataValues = [limit, safeOffset];
+        }
+
+        const dataResult = await pool.query(dataQuery, dataValues);
+
+        return {
+            rows: dataResult.rows,
+            total,
+            page: safePage,
+            limit,
+            totalPages,
+        };
+    }
 
     async findWithFilters(options?: {
         id?: string,
