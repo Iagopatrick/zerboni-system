@@ -3,23 +3,26 @@
 
 import { contextBridge, ipcRenderer } from "electron";
 
-interface GetUsersParams {
+interface PaginationParams {
   search?: string;
   page?: number;
   limit?: number;
 }
 
-interface GetUsersResponse {
-  rows: UserType[];
+interface PaginatedResponse<T> {
+  rows: T[];
   total: number;
   page: number;
   limit: number;
   totalPages: number;
 }
 
+type CreateCustomerPayload = Omit<CustomerType, "id" | "created_at">;
+type UpdateCustomerPayload = Partial<CreateCustomerPayload>;
+
 contextBridge.exposeInMainWorld("api", {
-  getUsers: (params?: GetUsersParams) =>
-    ipcRenderer.invoke("get-users", params) as Promise<GetUsersResponse>,
+  getUsers: (params?: PaginationParams) =>
+    ipcRenderer.invoke("get-users", params) as Promise<PaginatedResponse<UserType>>,
 
   createUsers: (data: { name?: string; email?: string; }) =>
     ipcRenderer.invoke("create-users", data),
@@ -29,4 +32,19 @@ contextBridge.exposeInMainWorld("api", {
 
   deleteUsers: (id: number) =>
     ipcRenderer.invoke("delete-users", id),
+
+  getCustomers: (params?: PaginationParams) =>
+    ipcRenderer.invoke(
+      "get-customers",
+      params
+    ) as Promise<PaginatedResponse<CustomerType>>,
+
+  createCustomers: (data: CreateCustomerPayload) =>
+    ipcRenderer.invoke("create-customers", data) as Promise<CustomerType>,
+
+  updateCustomers: (id: number, data: UpdateCustomerPayload) =>
+    ipcRenderer.invoke("update-customers", { id, data }) as Promise<CustomerType>,
+
+  deleteCustomers: (id: number) =>
+    ipcRenderer.invoke("delete-customers", id) as Promise<void>,
 });

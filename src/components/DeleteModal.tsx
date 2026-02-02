@@ -1,16 +1,18 @@
-import { Button } from "../../../components/Button";
+import { Button } from "./Button";
 
-interface DeleteUserModalProps {
+interface DeleteModalProps {
+  text: string,
   open: boolean;
   onConfirm: () => void;
   onClose: () => void;
 }
 
-export const DeleteUserModal = ({
+export const DeleteModal = ({
+  text,
   open,
   onConfirm,
   onClose,
-}: DeleteUserModalProps) => {
+}: DeleteModalProps) => {
   if (!open) return null;
 
   return (
@@ -21,7 +23,7 @@ export const DeleteUserModal = ({
       </h2>
 
       <p className="mb-6 text-white">
-      Tem certeza que deseja excluir o usuário?
+      {text}
       <br />
       Essa ação não poderá ser desfeita.
       </p>

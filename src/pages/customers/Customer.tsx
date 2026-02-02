@@ -1,81 +1,84 @@
 import { useEffect, useState } from "react";
-import { userService } from "../../services/user-service";
 import SearchBar from "../../components/SearchBar";
 import GenericTable from "../../components/GenericTable";
-import FilterButtons from "../../components/FilterButtons";
-import { title } from "process";
 import { ActionButtons } from "../../components/ActionButtons";
-import { CreateUserModal } from "./components/CreateUserModal";
 import { ButtonAdd } from "../../components/ButtonAdd";
 import { DeleteModal } from "../../components/DeleteModal";
 
-interface UserPageProps {
+interface CustomerPageProps {
   onCreate: () => void;
   onView: (id: number) => void;
   onEdit: (id: number) => void;
 }
 
-export const Userpage = ({ onCreate, onView, onEdit }: UserPageProps) => {
-  const [users, setUsers] = useState<UserType[]>([]);
+export const CustomerPage = ({ onCreate, onView, onEdit }: CustomerPageProps) => {
+  const [customer, setCustomer] = useState<CustomerType[]>([]);
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
-  const [totalUsers, setTotalUsers] = useState(0);
+  const [totalCustomer, setTotalCustomer] = useState(0);
   const [search, setSearch] = useState("");
   
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [userToDelete, setUserToDelete] = useState<number>(null);
+  const [customerToDelete, setCustomerToDelete] = useState<number>(null);
   
-  async function loadUsers() {
-    const { rows, total, page: currentPage, limit, totalPages } = await window.api.getUsers({
+  async function loadCustomers() {
+    const { rows, total, page: currentPage, limit, totalPages } = await window.api.getCustomers({
       search,
       page,
       limit: rowsPerPage,
     });
 
-    setUsers(rows);
-    setTotalUsers(total);
+    setCustomer(rows);
+    setTotalCustomer(total);
     setPage(currentPage);
     setRowsPerPage(limit);
     setTotalPages(totalPages);
   }
   useEffect(() => {
-    loadUsers();
+    loadCustomers();
   }, [search, page, rowsPerPage]);
 
-  function openDeleteModal(userId: number) {
-    setUserToDelete(userId);
+  function openDeleteModal(customerId: number) {
+    setCustomerToDelete(customerId);
     setDeleteModalOpen(true);
   }
 
   async function confirmDelete() {
-    if (!userToDelete) return;
+    if (!customerToDelete) return;
 
-    await window.api.deleteUsers(userToDelete);
+    await window.api.deleteCustomers(customerToDelete);
 
     setDeleteModalOpen(false);
-    setUserToDelete(null);
+    setCustomerToDelete(null);
 
-    loadUsers();
+    loadCustomers();
   }
 
   const columns = [
     {
       key: "name",
       title: "Nome",
-      render: (r: UserType) => (
+      render: (r: CustomerType) => (
         <p className="font-bold p-2 min-w-30">{r.name}</p>
       ),
     },
     {
-      key: "email",
-      title: "E-mail",
-      render: (r: UserType) => r.email || "-",
+      key: "phone",
+      title: "Telefone",
+      render: (r: CustomerType) => (
+        <p className="font-bold p-2 min-w-30">{r.phoneNumber}</p>
+      ),
+    },
+    {
+      key: "cpf",
+      title: "CPF",
+      render: (r: CustomerType) => r.cpf || "-",
     },
     {
       key: "created_at",
       title: "Criado em",
-      render: (r: UserType) =>
+      render: (r: CustomerType) =>
         r.created_at
           ? new Date(r.created_at).toLocaleString()
           : "-",
@@ -83,7 +86,7 @@ export const Userpage = ({ onCreate, onView, onEdit }: UserPageProps) => {
     {
       key: "update",
       title: "Ação",
-      render: (r: UserType) => (
+      render: (r: CustomerType) => (
         <ActionButtons
           onInfo={() => onView(Number(r.id))}
           onEdit={() => onEdit(Number(r.id))}
@@ -96,11 +99,11 @@ export const Userpage = ({ onCreate, onView, onEdit }: UserPageProps) => {
   return (
     <div className="pt-10 w-full">
       <DeleteModal
-        text="Tem certeza que deseja excluir o usuário?"
+        text="Tem certeza que deseja excluir o cliente?"
         open={deleteModalOpen}
         onClose={() => {
           setDeleteModalOpen(false);
-          setUserToDelete(null);
+          setCustomerToDelete(null);
         }}
         onConfirm={confirmDelete}
       />
@@ -108,7 +111,7 @@ export const Userpage = ({ onCreate, onView, onEdit }: UserPageProps) => {
         <div className="flex gap-10 w-full mb-4">
           <SearchBar
           className="w-full"
-            placeholder="Buscar usuários..."
+            placeholder="Buscar cliente..."
             value={search}
             onChange={(value) => setSearch(value)}
           />
@@ -116,16 +119,16 @@ export const Userpage = ({ onCreate, onView, onEdit }: UserPageProps) => {
             onClick={onCreate}
             className="bg-blue-600 text-white px-4 py-2 rounded"
           >
-            Adicionar Usuário
+            Adicionar Cliente
           </ButtonAdd>
         </div>
 
         <GenericTable 
           columns={columns}
-          data={users}
+          data={customer}
           page={page}
           totalPages={totalPages}
-          totalElements={totalUsers}
+          totalElements={totalCustomer}
           rowsPerPage={rowsPerPage}
           onPageChange={(newPage) => setPage(newPage)}
           onRowsPerPageChange={(newLimit) => {

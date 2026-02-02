@@ -5,9 +5,23 @@ export async function customerRoutes(app: FastifyInstance) {
     const service = new CustomerService();
 
     app.get("/", async (request, reply) => {
-        const filters = request.query as any; // Pega tudo o que vier após o "?" na URL
-        return service.listCustomers(filters);
-
+        try {
+            const { search = "", page = "1", limit = "10" } = request.query as any;
+            const pageNum = parseInt(page, 10);
+            const limitNum = parseInt(limit, 10);
+            const result = await service.listCustomers({
+                search,
+                page: pageNum,
+                limit: limitNum,
+            });
+            return result;
+        } catch (err: any) {
+            reply.code(500);
+            return {
+                message: err.message,
+                status: "error",
+            };
+        }
     });
 
     app.post("/", async (request, reply) => {

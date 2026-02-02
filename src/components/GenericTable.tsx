@@ -24,14 +24,14 @@ type Props<T = any> = {
   data: T[];
   page: number;
   totalPages: number;
-  totalUsers: number;
+  totalElements: number;
   rowsPerPage: number;
   onPageChange?: (newPage: number) => void;
   onRowsPerPageChange?: (newRowsPerPage: number) => void;
   onRowClick?: (row: T) => void;
 };
 
-export function GenericTable<T>({ columns, data, page, totalPages, totalUsers, rowsPerPage, onPageChange, onRowsPerPageChange, onRowClick }: Props<T>) {
+export function GenericTable<T>({ columns, data, page, totalPages, totalElements, rowsPerPage, onPageChange, onRowsPerPageChange, onRowClick }: Props<T>) {
   return (
     <TableContainer
       component={Paper}
@@ -143,7 +143,7 @@ export function GenericTable<T>({ columns, data, page, totalPages, totalUsers, r
                   className="text-sm font-medium text-gray-700"
                   style={{ lineHeight: "36px" }}
                 >
-                  de {totalUsers}
+                  de {totalElements}
                 </span>
               </div>
               

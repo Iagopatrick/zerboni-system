@@ -1,20 +1,24 @@
 import { CustomerRepository } from "./customer.repository";
 
+interface ListCustomersParams {
+    search?: string;
+    page?: number;
+    limit?: number;
+}
+
 export class CustomerService {
     private repository = new CustomerRepository();
 
-    async listCustomers(filters?: {
-        name?: string,
-        cpf?: string,
-        cep?: string,
-        street?: string,
-        neighborhood?: string,
-        state?: string,
-        streetNumber?: number,
-        phoneNumber?: string,
-        email?: string
-    }) {
-        return this.repository.findWithFilters(filters);
+    async listCustomers({
+        search = "",
+        page = 1,
+        limit = 10,
+    }: ListCustomersParams) {
+        return this.repository.findAll({
+            search,
+            page,
+            limit,
+        });
     }
 
     async createCustomer(data: {

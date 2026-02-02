@@ -20,8 +20,8 @@ export const ZerboniIcon = ({ width = 66, height = 67 }) => {
         fill="#0277A0"
       />
       <path
-        fill-rule="evenodd"
-        clip-rule="evenodd"
+        fillRule="evenodd"
+        clipRule="evenodd"
         d="M26.9433 55.5477L26.9241 55.4359L26.9075 55.3407L26.9435 55.5485"
         fill="#DC4342"
       />

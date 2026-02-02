@@ -20,39 +20,61 @@ declare module "*.svg" {
   export default src;
 }
 
-interface GetUsersParams {
+interface PaginationParams {
   search?: string;
   page?: number;
   limit?: number;
 }
 
-interface GetUsersResponse {
-  rows: UserType[];
+interface PaginatedResponse<T> {
+  rows: T[];
   total: number;
   page: number;
   limit: number;
   totalPages: number;
 }
 
+type CreateUserPayload = {
+  name: string;
+  email: string;
+};
+
+type UpdateUserPayload = Partial<CreateUserPayload>;
+
+type CreateCustomerPayload = Omit<CustomerType, "id" | "created_at">;
+
+type UpdateCustomerPayload = Partial<CreateCustomerPayload>;
+
 declare global {
   interface Window {
     api: {
-      getUsers: (params?: GetUsersParams) => Promise<GetUsersResponse>;
+      getUsers: (
+        params?: PaginationParams
+      ) => Promise<PaginatedResponse<UserType>>;
 
-      createUsers: (data: {
-        name: string;
-        email: string;
-      }) => Promise<any>;
+      createUsers: (data: CreateUserPayload) => Promise<UserType>;
 
       updateUsers: (
         id: number,
-        data: {
-          name?: string;
-          email?: string;
-        }
-      ) => Promise<any>;
+        data: UpdateUserPayload
+      ) => Promise<UserType>;
 
       deleteUsers: (id: number) => Promise<void>;
+
+      getCustomers: (
+        params?: PaginationParams
+      ) => Promise<PaginatedResponse<CustomerType>>;
+
+      createCustomers: (
+        data: CreateCustomerPayload
+      ) => Promise<CustomerType>;
+
+      updateCustomers: (
+        id: number,
+        data: UpdateCustomerPayload
+      ) => Promise<CustomerType>;
+
+      deleteCustomers: (id: number) => Promise<void>;
     };
   }
 }
