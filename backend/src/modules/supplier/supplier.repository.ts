@@ -28,7 +28,95 @@ export interface Supplier {
     created_at: Date;
 }
 
+interface FindAllParams {
+    search?: string;
+    page?: number;
+    limit?: number;
+}
+
 export class SupplierRepository {
+
+    async findAll({ search = "", page = 1, limit = 10 }: FindAllParams) {
+        let offset: number;
+
+        const countQuery = search
+            ? `
+            SELECT COUNT(*) AS total
+            FROM suppliers
+            WHERE legal_name ILIKE $1 OR email ILIKE $1
+            `
+            : `
+            SELECT COUNT(*) AS total
+            FROM suppliers
+            `;
+
+        const countValues = search ? [`%${search}%`] : [];
+        const countResult = await pool.query(countQuery, countValues);
+        const total = parseInt(countResult.rows[0].total, 10);
+
+        const totalPages = Math.max(1, Math.ceil(total / limit));
+        const safePage = Math.min(page, totalPages);
+
+        offset = (safePage - 1) * limit;
+
+        let dataQuery: string;
+        let dataValues: any[];
+
+        dataQuery = `
+            SELECT
+                id,
+                legal_name        AS "legalName",
+                active,
+                cep,
+                street,
+                street_number     AS "streetNumber",
+                neighborhood,
+                city,
+                state,
+                phone_number      AS "phoneNumber",
+                fax,
+                cnpj,
+                producer_tax_id   AS "producerTaxId",
+                municipal_tax_id  AS "municipalTaxId",
+                state_tax_id      AS "stateTaxId",
+                website,
+                email,
+                invoce_email      AS "invoceEmail",
+                cash_account      AS "cashAccount",
+                tax_regime        AS "taxRegime",
+                payment_methods   AS "paymentMethods",
+                notes,
+                created_at `;
+
+        if (search) {
+            dataQuery += `
+            
+            FROM suppliers
+            WHERE CAST(id AS TEXT) ILIKE $1 OR legal_name ILIKE $1 OR city ILIKE $1 OR cnpj ILIKE $1 OR email ILIKE $1
+            ORDER BY created_at DESC
+            LIMIT $2 OFFSET $3
+            `;
+            dataValues = [`%${search}%`, limit, offset];
+        } else {
+            dataQuery += `
+            
+            FROM suppliers
+            ORDER BY created_at DESC
+            LIMIT $1 OFFSET $2
+            `;
+            dataValues = [limit, offset];
+        }
+
+        const dataResult = await pool.query(dataQuery, dataValues);
+
+        return {
+            rows: dataResult.rows,
+            total,
+            page: safePage,
+            limit,
+            totalPages,
+        };
+    }
 
     async findWithFilters(options?: {
         id?: string,
@@ -132,119 +220,119 @@ export class SupplierRepository {
     async update(
         id: number,
         data: Partial<Supplier>
-        ): Promise<Supplier | null> {
+    ): Promise<Supplier | null> {
 
         const fields: string[] = [];
         const values: any[] = [];
         let counter = 1;
 
         if (data.legalName !== undefined) {
-        fields.push(`legal_name = $${counter++}`);
-        values.push(data.legalName);
+            fields.push(`legal_name = $${counter++}`);
+            values.push(data.legalName);
         }
 
         if (data.active !== undefined) {
-        fields.push(`active = $${counter++}`);
-        values.push(data.active);
+            fields.push(`active = $${counter++}`);
+            values.push(data.active);
         }
 
         if (data.cep !== undefined) {
-        fields.push(`cep = $${counter++}`);
-        values.push(data.cep);
+            fields.push(`cep = $${counter++}`);
+            values.push(data.cep);
         }
 
         if (data.street !== undefined) {
-        fields.push(`street = $${counter++}`);
-        values.push(data.street);
+            fields.push(`street = $${counter++}`);
+            values.push(data.street);
         }
 
         if (data.streetNumber !== undefined) {
-        fields.push(`street_number = $${counter++}`);
-        values.push(data.streetNumber);
+            fields.push(`street_number = $${counter++}`);
+            values.push(data.streetNumber);
         }
 
         if (data.neighborhood !== undefined) {
-        fields.push(`neighborhood = $${counter++}`);
-        values.push(data.neighborhood);
+            fields.push(`neighborhood = $${counter++}`);
+            values.push(data.neighborhood);
         }
 
         if (data.city !== undefined) {
-        fields.push(`city = $${counter++}`);
-        values.push(data.city);
+            fields.push(`city = $${counter++}`);
+            values.push(data.city);
         }
 
         if (data.state !== undefined) {
-        fields.push(`state = $${counter++}`);
-        values.push(data.state);
+            fields.push(`state = $${counter++}`);
+            values.push(data.state);
         }
 
         if (data.phoneNumber !== undefined) {
-        fields.push(`phone_number = $${counter++}`);
-        values.push(data.phoneNumber);
+            fields.push(`phone_number = $${counter++}`);
+            values.push(data.phoneNumber);
         }
 
         if (data.fax !== undefined) {
-        fields.push(`fax = $${counter++}`);
-        values.push(data.fax);
+            fields.push(`fax = $${counter++}`);
+            values.push(data.fax);
         }
 
         if (data.cnpj !== undefined) {
-        fields.push(`cnpj = $${counter++}`);
-        values.push(data.cnpj);
+            fields.push(`cnpj = $${counter++}`);
+            values.push(data.cnpj);
         }
 
         if (data.producerTaxId !== undefined) {
-        fields.push(`producer_tax_id = $${counter++}`);
-        values.push(data.producerTaxId);
+            fields.push(`producer_tax_id = $${counter++}`);
+            values.push(data.producerTaxId);
         }
 
         if (data.municipalTaxId !== undefined) {
-        fields.push(`municipal_tax_id = $${counter++}`);
-        values.push(data.municipalTaxId);
+            fields.push(`municipal_tax_id = $${counter++}`);
+            values.push(data.municipalTaxId);
         }
 
         if (data.stateTaxId !== undefined) {
-        fields.push(`state_tax_id = $${counter++}`);
-        values.push(data.stateTaxId);
+            fields.push(`state_tax_id = $${counter++}`);
+            values.push(data.stateTaxId);
         }
 
         if (data.website !== undefined) {
-        fields.push(`website = $${counter++}`);
-        values.push(data.website);
+            fields.push(`website = $${counter++}`);
+            values.push(data.website);
         }
 
         if (data.email !== undefined) {
-        fields.push(`email = $${counter++}`);
-        values.push(data.email);
+            fields.push(`email = $${counter++}`);
+            values.push(data.email);
         }
 
         if (data.invoceEmail !== undefined) {
-        fields.push(`invoce_email = $${counter++}`);
-        values.push(data.invoceEmail);
+            fields.push(`invoce_email = $${counter++}`);
+            values.push(data.invoceEmail);
         }
 
         if (data.cashAccount !== undefined) {
-        fields.push(`cash_account = $${counter++}`);
-        values.push(data.cashAccount);
+            fields.push(`cash_account = $${counter++}`);
+            values.push(data.cashAccount);
         }
 
         if (data.taxRegime !== undefined) {
-        fields.push(`tax_regime = $${counter++}`);
-        values.push(data.taxRegime);
+            fields.push(`tax_regime = $${counter++}`);
+            values.push(data.taxRegime);
         }
 
         if (data.paymentMethods !== undefined) {
-        fields.push(`payment_methods = $${counter++}`);
-        values.push(data.paymentMethods);
+            fields.push(`payment_methods = $${counter++}`);
+            values.push(data.paymentMethods);
         }
 
         if (data.notes !== undefined) {
-        fields.push(`notes = $${counter++}`);
-        values.push(data.notes);
+            fields.push(`notes = $${counter++}`);
+            values.push(data.notes);
         }
 
         if (fields.length === 0) {
-        return null;
+            return null;
         }
 
         const query = `
@@ -281,7 +369,7 @@ export class SupplierRepository {
 
         const { rows } = await pool.query(query, values);
         return rows[0] ?? null;
-        }
+    }
 
     async delete(id: string): Promise<void> {
         await pool.query("DELETE FROM suppliers WHERE id = $1", [id]);

@@ -7,12 +7,21 @@ export async function supplierRoutes(app: FastifyInstance) {
 
     app.get("/", async (request, reply) => {
         try {
-            const filters = request.query as any;
-            const suppliers = await service.listSuppliers(filters);
-            return suppliers;
+            const { search = "", page = "1", limit = "10" } = request.query as any;
+
+            const pageNum = parseInt(page, 10);
+            const limitNum = parseInt(limit, 10);
+
+            const result = await service.listSuppliers({
+                search,
+                page: pageNum,
+                limit: limitNum,
+            });
+
+            return result;
         } catch (err: any) {
             reply.code(500);
-            return { message: "Erro ao listar fornecedores", error: err.message };
+            return { message: err.message, status: "error" };
         }
     });
 

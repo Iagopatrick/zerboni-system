@@ -1,5 +1,6 @@
 import axios from "axios";
 import { ipcMain } from "electron";
+import { SupplierType } from "./types/supplier";
 
 interface PaginationParams {
   search?: string;
@@ -67,6 +68,44 @@ ipcMain.handle(
   "delete-customers",
   async (_event, id: number) => {
     await axios.delete(`${API_URL}/customers/${id}`);
+    return true;
+  }
+);
+
+type CreateSupplierPayload = Omit<SupplierType, "id" | "created_at">;
+type UpdateSupplierPayload = Partial<CreateSupplierPayload>;
+
+ipcMain.handle(
+  "get-suppliers",
+  async (_event, params?: PaginationParams) => {
+    const res = await axios.get(`${API_URL}/suppliers`, { params });
+    return res.data as PaginatedResponse<SupplierType>;
+  }
+);
+
+ipcMain.handle(
+  "create-suppliers",
+  async (_event, data: CreateSupplierPayload) => {
+    const res = await axios.post(`${API_URL}/suppliers`, data);
+    return res.data as SupplierType;
+  }
+);
+
+ipcMain.handle(
+  "update-suppliers",
+  async (
+    _event,
+    { id, data }: { id: number; data: UpdateSupplierPayload }
+  ) => {
+    const res = await axios.put(`${API_URL}/suppliers/${id}`, data);
+    return res.data as SupplierType;
+  }
+);
+
+ipcMain.handle(
+  "delete-suppliers",
+  async (_event, id: number) => {
+    await axios.delete(`${API_URL}/suppliers/${id}`);
     return true;
   }
 );

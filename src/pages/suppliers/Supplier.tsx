@@ -4,37 +4,39 @@ import GenericTable from "../../components/GenericTable";
 import { ActionButtons } from "../../components/ActionButtons";
 import { ButtonAdd } from "../../components/ButtonAdd";
 import { DeleteModal } from "../../components/DeleteModal";
+import { SupplierType } from "../../types/supplier";
 import { ErrorModal } from "../../components/ErrorModal";
 
-interface UserPageProps {
+interface SupplierPageProps {
   onCreate: () => void;
   onView: (id: number) => void;
   onEdit: (id: number) => void;
 }
 
-export const Userpage = ({ onCreate, onView, onEdit }: UserPageProps) => {
-  const [users, setUsers] = useState<UserType[]>([]);
+export const SupplierPage = ({ onCreate, onView, onEdit }: SupplierPageProps) => {
+  const [suppliers, setSuppliers] = useState<SupplierType[]>([]);
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
-  const [totalUsers, setTotalUsers] = useState(0);
+  const [totalSuppliers, setTotalSuppliers] = useState(0);
   const [search, setSearch] = useState("");
-  
+
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [userToDelete, setUserToDelete] = useState<number>(null);
+  const [supplierToDelete, setSupplierToDelete] = useState<number | null>(null);
 
   const [error, setError] = useState<string | null>(null);
-  
-  async function loadUsers() {
+
+  async function loadSuppliers() {
     try{
-      const { rows, total, page: currentPage, limit, totalPages } = await window.api.getUsers({
+      const { rows, total, page: currentPage, limit, totalPages } =
+      await window.api.getSuppliers({
         search,
         page,
         limit: rowsPerPage,
       });
 
-      setUsers(rows);
-      setTotalUsers(total);
+      setSuppliers(rows);
+      setTotalSuppliers(total);
       setPage(currentPage);
       setRowsPerPage(limit);
       setTotalPages(totalPages);
@@ -51,25 +53,26 @@ export const Userpage = ({ onCreate, onView, onEdit }: UserPageProps) => {
     }
     
   }
+
   useEffect(() => {
-    loadUsers();
+    loadSuppliers();
   }, [search, page, rowsPerPage]);
 
-  function openDeleteModal(userId: number) {
-    setUserToDelete(userId);
+  function openDeleteModal(supplierId: number) {
+    setSupplierToDelete(supplierId);
     setDeleteModalOpen(true);
   }
 
   async function confirmDelete() {
     try{
-      if (!userToDelete) return;
+      if (!supplierToDelete) return;
 
-      await window.api.deleteUsers(userToDelete);
+      await window.api.deleteSuppliers(supplierToDelete);
 
       setDeleteModalOpen(false);
-      setUserToDelete(null);
+      setSupplierToDelete(null);
 
-      loadUsers();
+      loadSuppliers();
     }catch(err){
       let message = "Erro inesperado";
 
@@ -85,50 +88,54 @@ export const Userpage = ({ onCreate, onView, onEdit }: UserPageProps) => {
 
   const columns = [
     {
-      key: "name",
-      title: "Nome",
-      render: (r: UserType) => (
-        <p className="font-bold p-2 min-w-30">{r.name}</p>
+      key: "legal_name",
+      title: "Nome Legal",
+      render: (r: SupplierType) => (
+        <p className="font-bold p-2 min-w-30">{r.legalName}</p>
       ),
     },
     {
       key: "email",
       title: "E-mail",
-      render: (r: UserType) => r.email || "-",
+      render: (r: SupplierType) => r.email || "-",
+    },
+    {
+      key: "cnpj",
+      title: "E-CNPJ",
+      render: (r: SupplierType) => r.cnpj || "-",
     },
     {
       key: "created_at",
       title: "Criado em",
-      render: (r: UserType) =>
+      render: (r: SupplierType) =>
         r.created_at
           ? new Date(r.created_at).toLocaleString()
           : "-",
     },
     {
-      key: "update",
+      key: "actions",
       title: "Ação",
-      render: (r: UserType) => (
+      render: (r: SupplierType) => (
         <ActionButtons
           onInfo={() => onView(Number(r.id))}
           onEdit={() => onEdit(Number(r.id))}
           onRemove={() => openDeleteModal(Number(r.id))}
         />
       ),
-    }
+    },
   ];
 
   return (
-    <div className="pt-10 w-full overflow-y-auto max-h-screen pb-2">
+    <div className="pt-10 w-full">
       <DeleteModal
-        text="Tem certeza que deseja excluir o usuário?"
+        text="Tem certeza que deseja excluir o fornecedor?"
         open={deleteModalOpen}
         onClose={() => {
           setDeleteModalOpen(false);
-          setUserToDelete(null);
+          setSupplierToDelete(null);
         }}
         onConfirm={confirmDelete}
       />
-
       <ErrorModal
         open={!!error}
         errorMessage={error}
@@ -138,31 +145,32 @@ export const Userpage = ({ onCreate, onView, onEdit }: UserPageProps) => {
       <div className="flex flex-col items-center px-8">
         <div className="flex gap-10 w-full mb-4">
           <SearchBar
-          className="w-full"
-            placeholder="Buscar usuários..."
+            className="w-full"
+            placeholder="Buscar fornecedores..."
             value={search}
             onChange={(value) => setSearch(value)}
           />
+
           <ButtonAdd
             onClick={onCreate}
             className="bg-blue-600 text-white px-4 py-2 rounded"
           >
-            Adicionar Usuário
+            Adicionar Fornecedor
           </ButtonAdd>
         </div>
 
-        <GenericTable 
+        <GenericTable
           columns={columns}
-          data={users}
+          data={suppliers}
           page={page}
           totalPages={totalPages}
-          totalElements={totalUsers}
+          totalElements={totalSuppliers}
           rowsPerPage={rowsPerPage}
           onPageChange={(newPage) => setPage(newPage)}
           onRowsPerPageChange={(newLimit) => {
-                                setRowsPerPage(newLimit);
-                                setPage(1);
-                              }}
+            setRowsPerPage(newLimit);
+            setPage(1);
+          }}
         />
       </div>
     </div>

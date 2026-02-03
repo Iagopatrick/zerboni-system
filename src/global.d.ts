@@ -42,8 +42,10 @@ type CreateUserPayload = {
 type UpdateUserPayload = Partial<CreateUserPayload>;
 
 type CreateCustomerPayload = Omit<CustomerType, "id" | "created_at">;
-
 type UpdateCustomerPayload = Partial<CreateCustomerPayload>;
+
+type CreateSupplierPayload = Omit<SupplierType, "id" | "created_at">;
+type UpdateSupplierPayload = Partial<CreateSupplierPayload>;
 
 declare global {
   interface Window {
@@ -75,6 +77,21 @@ declare global {
       ) => Promise<CustomerType>;
 
       deleteCustomers: (id: number) => Promise<void>;
+
+      getSuppliers: (
+        params?: PaginationParams
+      ) => Promise<PaginatedResponse<SupplierType>>;
+
+      createSuppliers: (
+        data: CreateSupplierPayload
+      ) => Promise<SupplierType>;
+
+      updateSuppliers: (
+        id: number,
+        data: UpdateSupplierPayload
+      ) => Promise<any>;
+
+      deleteSuppliers: (id: number) => Promise<void>;
     };
   }
 }

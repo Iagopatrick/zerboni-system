@@ -4,6 +4,7 @@ import GenericTable from "../../components/GenericTable";
 import { ActionButtons } from "../../components/ActionButtons";
 import { ButtonAdd } from "../../components/ButtonAdd";
 import { DeleteModal } from "../../components/DeleteModal";
+import { ErrorModal } from "../../components/ErrorModal";
 
 interface CustomerPageProps {
   onCreate: () => void;
@@ -21,19 +22,33 @@ export const CustomerPage = ({ onCreate, onView, onEdit }: CustomerPageProps) =>
   
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [customerToDelete, setCustomerToDelete] = useState<number>(null);
+
+  const [error, setError] = useState<string | null>(null);
   
   async function loadCustomers() {
-    const { rows, total, page: currentPage, limit, totalPages } = await window.api.getCustomers({
-      search,
-      page,
-      limit: rowsPerPage,
-    });
+    try{
+      const { rows, total, page: currentPage, limit, totalPages } = await window.api.getCustomers({
+        search,
+        page,
+        limit: rowsPerPage,
+      });
 
-    setCustomer(rows);
-    setTotalCustomer(total);
-    setPage(currentPage);
-    setRowsPerPage(limit);
-    setTotalPages(totalPages);
+      setCustomer(rows);
+      setTotalCustomer(total);
+      setPage(currentPage);
+      setRowsPerPage(limit);
+      setTotalPages(totalPages);
+    }catch(err){
+      let message = "Erro inesperado";
+
+      if (err?.response?.data?.message) {
+        message = err.response.data.message;
+      } else if (err?.message) {
+        message = err.message;
+      }
+
+      setError(message);
+    }
   }
   useEffect(() => {
     loadCustomers();
@@ -45,14 +60,26 @@ export const CustomerPage = ({ onCreate, onView, onEdit }: CustomerPageProps) =>
   }
 
   async function confirmDelete() {
-    if (!customerToDelete) return;
+    try{
+      if (!customerToDelete) return;
 
-    await window.api.deleteCustomers(customerToDelete);
+      await window.api.deleteCustomers(customerToDelete);
 
-    setDeleteModalOpen(false);
-    setCustomerToDelete(null);
+      setDeleteModalOpen(false);
+      setCustomerToDelete(null);
 
-    loadCustomers();
+      loadCustomers();
+    }catch(err){
+      let message = "Erro inesperado";
+
+      if (err?.response?.data?.message) {
+        message = err.response.data.message;
+      } else if (err?.message) {
+        message = err.message;
+      }
+
+      setError(message);
+    }
   }
 
   const columns = [
@@ -97,7 +124,7 @@ export const CustomerPage = ({ onCreate, onView, onEdit }: CustomerPageProps) =>
   ];
 
   return (
-    <div className="pt-10 w-full">
+    <div className="pt-10 w-full overflow-y-auto max-h-screen pb-2">
       <DeleteModal
         text="Tem certeza que deseja excluir o cliente?"
         open={deleteModalOpen}
@@ -107,6 +134,13 @@ export const CustomerPage = ({ onCreate, onView, onEdit }: CustomerPageProps) =>
         }}
         onConfirm={confirmDelete}
       />
+
+      <ErrorModal
+        open={!!error}
+        errorMessage={error}
+        onClose={() => setError(null)}
+      />
+
       <div className="flex flex-col items-center px-8">
         <div className="flex gap-10 w-full mb-4">
           <SearchBar
