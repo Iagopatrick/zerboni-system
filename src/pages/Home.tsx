@@ -5,17 +5,22 @@ import { Userpage } from "./users/User";
 import { UserFormPage } from "./users/components/UserFormPage";
 import { CustomerPage } from "./customers/Customer";
 import { CustomerFormPage } from "./customers/components/CustomerFormPage";
+import { SupplierPage } from "./suppliers/Supplier";
+import { SupplierFormPage } from "./suppliers/components/SupplierFormPage";
 
 type UserView = "list" | "create" | "view" | "edit";
 
 export const HomePage = () => {
-  const [tab, setTab] = useState<TabsEnum>(TabsEnum.USUARIOS);
+  const [tab, setTab] = useState<TabsEnum>(TabsEnum.SUPPLIERS);
 
   const [userView, setUserView] = useState<UserView>("list");
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 
   const [customerView, setCustomerView] = useState<UserView>("list");
   const [selectedCustomerId, setSelectedCustomerId] = useState<number | null>(null);
+
+  const [supplierView, setSupplierView] = useState<UserView>("list");
+  const [selectedSupplierId, setSelectedSupplierId] = useState<number | null>(null);
 
   return (
     <div className="flex h-full bg-bluePrimary/85">
@@ -73,6 +78,35 @@ export const HomePage = () => {
               onBack={() => {
                 setCustomerView("list");
                 setSelectedCustomerId(null);
+              }}
+            />
+          )}
+        </>
+      )}
+
+      {tab === TabsEnum.SUPPLIERS && (
+        <>
+          {supplierView === "list" && (
+            <SupplierPage
+              onCreate={() => setSupplierView("create")}
+              onView={(id) => {
+                setSelectedSupplierId(id);
+                setSupplierView("view");
+              }}
+              onEdit={(id) => {
+                setSelectedSupplierId(id);
+                setSupplierView("edit");
+              }}
+            />
+          )}
+
+          {(supplierView === "create" || supplierView === "view" || supplierView === "edit") && (
+            <SupplierFormPage
+              mode={supplierView}
+              supplierId={selectedSupplierId}
+              onBack={() => {
+                setSupplierView("list");
+                setSelectedSupplierId(null);
               }}
             />
           )}

@@ -3,36 +3,8 @@ import { Button } from "../../../components/Button";
 import { Input } from "../../../components/Input";
 import { FaArrowLeft, FaUserCheck, FaUserEdit, FaUserPlus } from "react-icons/fa";
 import { Select } from "../../../components/Select";
-
-export const brazilStates = [
-  { value: "AC", label: "Acre" },
-  { value: "AL", label: "Alagoas" },
-  { value: "AP", label: "Amapá" },
-  { value: "AM", label: "Amazonas" },
-  { value: "BA", label: "Bahia" },
-  { value: "CE", label: "Ceará" },
-  { value: "DF", label: "Distrito Federal" },
-  { value: "ES", label: "Espírito Santo" },
-  { value: "GO", label: "Goiás" },
-  { value: "MA", label: "Maranhão" },
-  { value: "MT", label: "Mato Grosso" },
-  { value: "MS", label: "Mato Grosso do Sul" },
-  { value: "MG", label: "Minas Gerais" },
-  { value: "PA", label: "Pará" },
-  { value: "PB", label: "Paraíba" },
-  { value: "PR", label: "Paraná" },
-  { value: "PE", label: "Pernambuco" },
-  { value: "PI", label: "Piauí" },
-  { value: "RJ", label: "Rio de Janeiro" },
-  { value: "RN", label: "Rio Grande do Norte" },
-  { value: "RS", label: "Rio Grande do Sul" },
-  { value: "RO", label: "Rondônia" },
-  { value: "RR", label: "Roraima" },
-  { value: "SC", label: "Santa Catarina" },
-  { value: "SP", label: "São Paulo" },
-  { value: "SE", label: "Sergipe" },
-  { value: "TO", label: "Tocantins" },
-];
+import {brazilStates} from "../../../constans/states";
+import { ErrorModal } from "../../../components/ErrorModal";
 
 interface CustomerFormPageProps {
   mode: "create" | "view" | "edit";
@@ -52,6 +24,8 @@ export const CustomerFormPage = ({ mode, customerId, onBack }: CustomerFormPageP
   const [phoneNumber, setPhoneNumber] = useState("");
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if ((mode === "edit" || mode === "view") && customerId !== null) {
@@ -110,14 +84,22 @@ export const CustomerFormPage = ({ mode, customerId, onBack }: CustomerFormPageP
 
       onBack(); 
     } catch (err) {
-      console.error("Erro ao salvar cliente:", err);
+      let message = "Erro inesperado";
+
+      if (err?.response?.data?.message) {
+        message = err.response.data.message;
+      } else if (err?.message) {
+        message = err.message;
+      }
+
+      setError(message);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="p-10  h-full w-full">
+    <div className="p-10  h-full w-full  overflow-y-auto max-h-screen">
       
       <div className="flex text-secondary mb-8 ">
         <Button 
@@ -133,6 +115,12 @@ export const CustomerFormPage = ({ mode, customerId, onBack }: CustomerFormPageP
           {mode === "edit" && <><FaUserEdit />Editar Cliente</>}
         </h1>
       </div>
+
+      <ErrorModal
+        open={!!error}
+        errorMessage={error}
+        onClose={() => setError(null)}
+      />
 
       <form className="flex flex-col gap-4 max-w-md" onSubmit={handleSubmit}>
         <div className="">

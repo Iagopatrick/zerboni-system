@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Button } from "../../../components/Button";
 import { Input } from "../../../components/Input";
 import { FaArrowLeft, FaUserCheck, FaUserEdit, FaUserPlus } from "react-icons/fa";
+import { ErrorModal } from "../../../components/ErrorModal";
 
 interface UserFormPageProps {
   mode: "create" | "view" | "edit";
@@ -14,6 +15,9 @@ export const UserFormPage = ({ mode, userId, onBack }: UserFormPageProps) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const [error, setError] = useState<string | null>(null);
+
 
   useEffect(() => {
     if ((mode === "edit" || mode === "view") && userId !== null) {
@@ -45,14 +49,22 @@ export const UserFormPage = ({ mode, userId, onBack }: UserFormPageProps) => {
 
       onBack(); 
     } catch (err) {
-      console.error("Erro ao salvar usuário:", err);
+        let message = "Erro inesperado";
+
+        if (err?.response?.data?.message) {
+          message = err.response.data.message;
+        } else if (err?.message) {
+          message = err.message;
+        }
+
+        setError(message);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="p-10  h-full w-full">
+    <div className="p-10 h-full w-full overflow-y-auto max-h-screen">
       
       <div className="flex text-secondary mb-8 ">
         <Button 
@@ -68,6 +80,12 @@ export const UserFormPage = ({ mode, userId, onBack }: UserFormPageProps) => {
           {mode === "edit" && <><FaUserEdit />Editar Usuário</>}
         </h1>
       </div>
+
+      <ErrorModal
+        open={!!error}
+        errorMessage={error}
+        onClose={() => setError(null)}
+      />
 
       <form className="flex flex-col gap-4 max-w-md" onSubmit={handleSubmit}>
         <div className="">

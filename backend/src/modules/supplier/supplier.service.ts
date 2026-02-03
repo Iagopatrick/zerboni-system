@@ -1,15 +1,19 @@
 import { SupplierRepository, PaymentMethod } from "./supplier.repository";
 
+export interface ListSuppliersParams {
+    search?: string;
+    page?: number;
+    limit?: number;
+}
 export class SupplierService {
     private repository = new SupplierRepository();
 
-    async listSuppliers(filters?: {
-        id?: string,
-        legalName?: string,
-        city?: string,
-        cnpj?: string
-    }) {
-        return this.repository.findWithFilters(filters);
+    async listSuppliers({
+        search = "",
+        page = 1,
+        limit = 10,
+    }: ListSuppliersParams) {
+        return this.repository.findAll({ search, page, limit });
     }
 
     async createSupplier(data: {

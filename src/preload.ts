@@ -2,6 +2,7 @@
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
 
 import { contextBridge, ipcRenderer } from "electron";
+import { SupplierType } from "./types/supplier";
 
 interface PaginationParams {
   search?: string;
@@ -19,6 +20,9 @@ interface PaginatedResponse<T> {
 
 type CreateCustomerPayload = Omit<CustomerType, "id" | "created_at">;
 type UpdateCustomerPayload = Partial<CreateCustomerPayload>;
+
+type CreateSupplierPayload = Omit<SupplierType, "id" | "created_at">;
+type UpdateSupplierPayload = Partial<CreateSupplierPayload>;
 
 contextBridge.exposeInMainWorld("api", {
   getUsers: (params?: PaginationParams) =>
@@ -47,4 +51,16 @@ contextBridge.exposeInMainWorld("api", {
 
   deleteCustomers: (id: number) =>
     ipcRenderer.invoke("delete-customers", id) as Promise<void>,
+
+  getSuppliers: (params?: PaginationParams) =>
+    ipcRenderer.invoke("get-suppliers", params) as Promise<PaginatedResponse<SupplierType>>,
+
+  createSuppliers: (data: CreateSupplierPayload) =>
+    ipcRenderer.invoke("create-suppliers", data) as Promise<SupplierType>,
+
+  updateSuppliers: (id: number, data: UpdateSupplierPayload) =>
+    ipcRenderer.invoke("update-suppliers", { id, data }) as Promise<SupplierType>,
+
+  deleteSuppliers: (id: number) =>
+    ipcRenderer.invoke("delete-suppliers", id) as Promise<void>,
 });
