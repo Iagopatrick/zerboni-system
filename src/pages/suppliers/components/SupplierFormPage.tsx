@@ -71,37 +71,50 @@ export const SupplierFormPage = ({
 
   useEffect(() => {
     if ((mode === "edit" || mode === "view") && supplierId) {
-      (async () => {
-        const res = await window.api.getSuppliers();
-        const supplier = res.rows.find((s) => s.id === supplierId);
-        if (!supplier) return;
-        console.log(supplier)
-        setLegalName(supplier.legalName);
-        setActive(supplier.active);
-        setCnpj(supplier.cnpj);
-        setEmail(supplier.email);
-        setInvoiceEmail(supplier.invoceEmail ?? "");
-        setPhone(supplier.phoneNumber);
-        setFax(supplier.fax ?? "");
+      try{
+        async function loadSupplier() {
+          const res = await window.api.getSuppliers();
+          const supplier = res.rows.find((s) => s.id === supplierId);
+          if (!supplier) return;
+          
+          setLegalName(supplier.legalName);
+          setActive(supplier.active);
+          setCnpj(supplier.cnpj);
+          setEmail(supplier.email);
+          setInvoiceEmail(supplier.invoceEmail ?? "");
+          setPhone(supplier.phoneNumber);
+          setFax(supplier.fax ?? "");
 
-        setCep(supplier.cep);
-        setStreet(supplier.street);
-        setStreetNumber(supplier.streetNumber);
-        setNeighborhood(supplier.neighborhood);
-        setCity(supplier.city);
-        setState(supplier.state);
+          setCep(supplier.cep);
+          setStreet(supplier.street);
+          setStreetNumber(supplier.streetNumber);
+          setNeighborhood(supplier.neighborhood);
+          setCity(supplier.city);
+          setState(supplier.state);
 
-        setProducerTaxId(supplier.producerTaxId ?? "");
-        setMunicipalTaxId(supplier.municipalTaxId ?? "");
-        setStateTaxId(supplier.stateTaxId ?? "");
-        setTaxRegime(supplier.taxRegime);
+          setProducerTaxId(supplier.producerTaxId ?? "");
+          setMunicipalTaxId(supplier.municipalTaxId ?? "");
+          setStateTaxId(supplier.stateTaxId ?? "");
+          setTaxRegime(supplier.taxRegime);
 
-        setCashAccount(supplier.cashAccount);
-        setPaymentMethods(supplier.paymentMethods);
+          setCashAccount(supplier.cashAccount);
+          setPaymentMethods(supplier.paymentMethods);
 
-        setWebsite(supplier.website ?? "");
-        setNotes(supplier.notes ?? "");
-      })();
+          setWebsite(supplier.website ?? "");
+          setNotes(supplier.notes ?? "");
+        };
+        loadSupplier();
+      }catch(err){
+        let message = "Erro inesperado";
+
+        if (err?.response?.data?.message) {
+          message = err.response.data.message;
+        } else if (err?.message) {
+          message = err.message;
+        }
+
+        setError(message);
+      }
     }
   }, [mode, supplierId]);
 

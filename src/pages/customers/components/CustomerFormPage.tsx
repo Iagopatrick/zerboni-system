@@ -29,7 +29,7 @@ export const CustomerFormPage = ({ mode, customerId, onBack }: CustomerFormPageP
 
   useEffect(() => {
     if ((mode === "edit" || mode === "view") && customerId !== null) {
-      async function loadUser() {
+      async function loadCustomer() {
         try {
           const customers = await window.api.getCustomers();
           const customer = customers.rows.find((u: { id: number; }) => u.id === customerId);
@@ -45,10 +45,18 @@ export const CustomerFormPage = ({ mode, customerId, onBack }: CustomerFormPageP
             setEmail(customer.email);
           }
         } catch (err) {
-          console.error("Erro ao carregar cliente:", err);
+          let message = "Erro inesperado";
+
+          if (err?.response?.data?.message) {
+            message = err.response.data.message;
+          } else if (err?.message) {
+            message = err.message;
+          }
+
+          setError(message);
         }
       }
-      loadUser();
+      loadCustomer();
     }
   }, [mode, customerId]);
 

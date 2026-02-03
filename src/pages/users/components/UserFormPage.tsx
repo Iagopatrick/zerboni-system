@@ -30,7 +30,15 @@ export const UserFormPage = ({ mode, userId, onBack }: UserFormPageProps) => {
             setEmail(user.email);
           }
         } catch (err) {
-          console.error("Erro ao carregar usuário:", err);
+          let message = "Erro inesperado";
+
+          if (err?.response?.data?.message) {
+            message = err.response.data.message;
+          } else if (err?.message) {
+            message = err.message;
+          }
+
+          setError(message);
         }
       }
       loadUser();
