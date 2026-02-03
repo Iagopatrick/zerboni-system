@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS customers (
   neighborhood TEXT NOT NULL,
   state TEXT NOT NULL,
   street_number INT NOT NULL,
-  phone_number CHAR(14) NOT NULL, 
+  phone_number CHAR(11) NOT NULL, 
   email TEXT NOT NULL UNIQUE,
   created_at TIMESTAMP DEFAULT now()
 );
