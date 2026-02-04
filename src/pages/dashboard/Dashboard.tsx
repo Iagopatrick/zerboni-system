@@ -58,7 +58,7 @@ export const Dashboard = () => {
 
   return (
     <div className="p-4">
-      <Box sx={{ display: "flex", gap: "40px", marginBottom: "32px" }}>
+      <Box sx={{ width: "1000px", display: "flex", marginBottom: "32px", justifyContent: "space-between" }}>
         <CardCashflow title="Total de Vendas" value={formatToBRL(sales)} />
         <CardCashflowIn
           title="Total de Despesas"

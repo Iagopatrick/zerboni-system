@@ -158,7 +158,7 @@ export const CashFlowChart = ({ movimentation }: Props) => {
         borderRadius: "16px",
         padding: "16px",
         boxShadow: "0 8px 24px rgba(0,0,0,0.05)",
-        width: "900px",
+        width: "1000px",
       }}
     >
       <ChartComponent
