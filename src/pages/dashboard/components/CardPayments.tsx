@@ -27,6 +27,9 @@ const PaymentMethod = ({
         color="warning"
         sx={{ height: "10px", borderRadius: "4px", width: "100px" }}
       />
+      <Typography variant="body2" color={colors.secondary} sx={{display: "flex", alignItems: "center", justifyContent: "center"}}>
+        {`${Math.round(percentage)}%`}
+      </Typography>
     </Box>
   );
 };
@@ -35,6 +38,7 @@ export const CardPayments = ({ payments }: { payments: any[] }) => {
   return (
     <Box
       sx={{
+        width: "1000px",
         backgroundColor: "white",
         borderRadius: "16px",
         padding: "16px",
@@ -47,6 +51,7 @@ export const CardPayments = ({ payments }: { payments: any[] }) => {
       </Typography>
       <Box
         sx={{
+          justifyContent: "space-between",
           display: "flex",
           gap: "24px",
           padding: "4px",
