@@ -94,4 +94,47 @@ export class SaleRepository {
     const { rows } = await pool.query(query, phone ? [phone] : []);
     return rows;
   }
-}
+
+  async listSales(options?: {
+    id?: string;
+    customerId?: string;
+    fiscalRecordId?: string;
+  }): Promise<any[]> {
+    let query = `
+      SELECT * FROM sales WHERE 1=1
+    `;
+    const values: any[] = [];
+    let counter = 1;
+
+    if (options?.id) {
+      query += ` AND id = $${counter}`;
+      values.push(options.id);
+      counter++;
+    }
+
+    if (options?.customerId) {
+      query += ` AND customer_id = $${counter}`;
+      values.push(options.customerId);
+      counter++;
+    }
+
+    if (options?.fiscalRecordId) {
+      query += ` AND fiscal_record_id = $${counter}`;
+      values.push(options.fiscalRecordId);
+      counter++;
+    }
+
+    const { rows } = await pool.query(query, values);
+    return rows;
+  }
+
+
+  async listFiscalRecords() {
+    const query = `
+      SELECT * FROM fiscal_records ORDER BY created_at DESC
+    `;
+    const { rows } = await pool.query(query);
+    return rows;
+  }  
+
+  }

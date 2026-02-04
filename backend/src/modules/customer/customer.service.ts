@@ -1,4 +1,4 @@
-import { CustomerRepository } from "./customer.repository";
+import { Customer, CustomerRepository } from "./customer.repository";
 
 interface ListCustomersParams {
     search?: string;
@@ -38,6 +38,13 @@ export class CustomerService {
             page,
             limit,
         });
+    }
+
+    async listCustomersWithFilters(options?: {
+        id?: string,
+        name?: string,
+        cpf?: string}): Promise<Customer[]> {
+        return this.repository.findWithFilters(options);
     }
 
     async createCustomer(data: {
