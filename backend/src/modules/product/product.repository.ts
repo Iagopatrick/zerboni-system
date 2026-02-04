@@ -1,3 +1,4 @@
+import { create } from "domain";
 import { pool } from "../../../database";
 
 export interface Product {
@@ -20,11 +21,97 @@ export interface Product {
     created_at: Date;
 }
 
+interface FindAllProductsParams {
+    search?: string;
+    supplierCnpj?: string;
+    page?: number;
+    limit?: number;
+}
+
 export interface ProductWithSupplier extends Product {
     supplierName?: string;
 }
 
 export class ProductRepository {
+
+    async findAllProducts({
+        search = "",
+        supplierCnpj,
+        page = 1,
+        limit = 10,
+    }: FindAllProductsParams) {
+        let offset: number;
+
+        // 1️⃣ Contagem total de registros
+        const countQueryBase = `SELECT COUNT(*) AS total FROM products`;
+        const countValues: any[] = [];
+        const whereClauses: string[] = [];
+
+        if (search) {
+            whereClauses.push(`brand ILIKE $${countValues.length + 1} OR product_group ILIKE $${countValues.length + 1} OR reference ILIKE $${countValues.length + 1}  OR registration_id ILIKE $${countValues.length + 1}`);
+            countValues.push(`%${search}%`);
+        }
+
+        if (supplierCnpj) {
+            whereClauses.push(`supplier_cnpj = $${countValues.length + 1}`);
+            countValues.push(supplierCnpj);
+        }
+
+        const countQuery = whereClauses.length
+            ? `${countQueryBase} WHERE ${whereClauses.join(" AND ")}`
+            : countQueryBase;
+
+        const countResult = await pool.query(countQuery, countValues);
+        const total = parseInt(countResult.rows[0].total, 10);
+
+        // 2️⃣ Calcula total de páginas
+        const totalPages = Math.max(1, Math.ceil(total / limit));
+
+        // 3️⃣ Garante página segura
+        const safePage = Math.min(page, totalPages);
+        offset = (safePage - 1) * limit;
+
+        // 4️⃣ Query de dados
+        const dataValues: any[] = [...countValues, limit, offset];
+        const paramLimitIndex = dataValues.length - 1; // offset
+        const paramOffsetIndex = dataValues.length; // limit
+
+        const dataQuery = `
+    SELECT
+      id,
+      registration_id AS "registrationId",
+      branch,
+      product_group AS "productGroup",
+      brand,
+      description,
+      reference,
+      price,
+      stock,
+      product_type AS "productType",
+      unit_of_measure AS "unitOfMeasure",
+      images,
+      trade_name AS "tradeName",
+      active,
+      size,
+      supplier_cnpj AS "supplierCnpj",
+      created_at
+    FROM products
+    ${whereClauses.length ? "WHERE " + whereClauses.join(" AND ") : ""}
+    ORDER BY created_at DESC
+    LIMIT $${dataValues.length - 1} OFFSET $${dataValues.length}
+  `;
+
+        const dataResult = await pool.query(dataQuery, dataValues);
+
+        return {
+            rows: dataResult.rows,
+            total,
+            page: safePage,
+            limit,
+            totalPages,
+        };
+    }
+
     async findWithFilters(options?: {
         id?: string,
         registrationId?: string,

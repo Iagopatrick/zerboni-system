@@ -1,19 +1,26 @@
 import { ProductRepository } from './product.repository';
 import { SupplierRepository } from '../supplier/supplier.repository';
 
+interface ListProductsParams {
+    search?: string;
+    page?: number;
+    limit?: number;
+}
+
 export class ProductService {
     private repository = new ProductRepository();
     private supplierRepository = new SupplierRepository();
 
-    async listProducts(filters?: {
-        id?: string,
-        registrationId?: string,
-        productGroup?: string,
-        reference?: string,
-        brand?: string,
-        supplierCnpj?: string
-    }) {
-        return this.repository.findWithFilters(filters);
+    async listProducts({
+        search = "",
+        page = 1,
+        limit = 10,
+    }: ListProductsParams) {
+        return this.repository.findAllProducts({
+            search,
+            page,
+            limit,
+        });
     }
 
     async createProduct(data: {
