@@ -4,6 +4,8 @@
 import { contextBridge, ipcRenderer } from "electron";
 import { SupplierType } from "./types/supplier";
 import { SupplierPaymentType } from "./types/supplier-payment";
+import { ProductType } from "./types/product";
+import { DashboardData } from "./pages/dashboard/Dashboard";
 
 interface PaginationParams {
   search?: string;
@@ -27,6 +29,8 @@ type UpdateSupplierPayload = Partial<CreateSupplierPayload>;
 
 type CreateSupplierPaymentPayload = Omit<SupplierPaymentType, "id" | "created_at">;
 type UpdateSupplierPaymentPayload = Partial<CreateSupplierPaymentPayload>;
+type CreateProductPayload = Omit<ProductType, "id" | "created_at">;
+type UpdateProductPayload = Partial<CreateProductPayload>;
 
 contextBridge.exposeInMainWorld("api", {
   getUsers: (params?: PaginationParams) =>
@@ -79,4 +83,18 @@ contextBridge.exposeInMainWorld("api", {
 
   deleteSuppliersPayments: (id: number) =>
     ipcRenderer.invoke("delete-suppliers-payments", id) as Promise<void>,
+  getProducts: (params?: PaginationParams) =>
+    ipcRenderer.invoke("get-products", params) as Promise<PaginatedResponse<ProductType>>,
+
+  createProducts: (data: CreateProductPayload) =>
+    ipcRenderer.invoke("create-products", data) as Promise<ProductType>,
+
+  updateProducts: (id: number, data: UpdateProductPayload) =>
+    ipcRenderer.invoke("update-products", { id, data }) as Promise<ProductType>,
+
+  deleteProducts: (id: number) =>
+    ipcRenderer.invoke("delete-products", id) as Promise<void>,
+  
+  getDashboardData: () =>
+    ipcRenderer.invoke("get-dashboard-data") as Promise<DashboardData>,
 });

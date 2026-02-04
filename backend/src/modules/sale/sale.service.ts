@@ -17,7 +17,7 @@ export class SaleService {
     sellerId: string;
   }) {
     // Pré-condição: Validar se o cliente existe
-    const customer = await this.customerService.listCustomers({
+    const customer = await this.customerService.listCustomersWithFilters({
       cpf: data.cpf, // Tem que adicionar o campo id no filtro do CustomerService ""
     });
 
@@ -56,5 +56,27 @@ export class SaleService {
   // UC05 - Fluxo de Venda Condicional (Filtro por CPF)
   async listConditionals(cpf?: string) {
     return this.repository.listConditionals(cpf);
+  }
+
+  async listSales(options?: {
+    id?: string;
+    customerId?: string;
+    fiscalRecordId?: string;
+  }) {
+    return this.repository.listSales(options);
+  }
+
+  async listFiscalRecords(): Promise<
+    {
+      id: string;
+      date: Date;
+      value: number;
+      movement_type: number;
+      identifier: string;
+      description?: string;
+      created_at: Date;
+    }[]
+  > {
+    return this.repository.listFiscalRecords();
   }
 }

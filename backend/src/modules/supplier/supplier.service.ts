@@ -8,6 +8,30 @@ export interface ListSuppliersParams {
 export class SupplierService {
     private repository = new SupplierRepository();
 
+    private optionalFieldsValidator(
+        cleanCnpj?: string,
+        cleanCep?: string,
+        cleanPhone?: string,
+        cleanFax?: string | null
+    ) {
+        // Validação de tamanho de campos (cnpj, cep, telefone e fax)
+        if (cleanCnpj?.length !== 14) {
+            throw new Error("CNPJ inválido: deve conter 14 dígitos numéricos.");
+        }
+
+        if (cleanCep?.length !== 8) {
+            throw new Error("CEP inválido: deve conter 8 dígitos numéricos.")
+        }
+
+        if (cleanPhone?.length !== 11) {
+            throw new Error("Telefone inválido: deve conter 11 dígitos numéricos.")
+        }
+
+        if (cleanFax && cleanFax?.length !== 11) {
+            throw new Error("Fax inválido: deve conter 11 dígitos numéricos ou estar como um campo vazio.")
+        }
+    }
+
     async listSuppliers({
         search = "",
         page = 1,
@@ -50,6 +74,8 @@ export class SupplierService {
             throw new Error("Pelo menos uma inscrição (Produtor, Municipal ou Estadual) deve ser informada.");
         }
 
+        this.optionalFieldsValidator(cleanCnpj, cleanCep, cleanPhone, cleanFax);
+
         const cnpjExists = await this.repository.findWithFilters({ cnpj: cleanCnpj });
         if (cnpjExists.length > 0) {
             throw new Error("Já existe um fornecedor cadastrado com este CNPJ.");
@@ -82,6 +108,8 @@ export class SupplierService {
         if (!data.producerTaxId && !data.municipalTaxId && !data.stateTaxId) {
             throw new Error("Pelo menos uma inscrição (Produtor, Municipal ou Estadual) deve ser informada.");
         }
+
+        this.optionalFieldsValidator(cleanCnpj, cleanCep, cleanPhone, cleanFax);
 
         const suppliers = await this.repository.findWithFilters({ id: String(id) });
         if (suppliers.length === 0) {

@@ -5,7 +5,8 @@ CREATE TABLE IF NOT EXISTS fiscal_records (
     id SERIAL PRIMARY KEY,
     date DATE NOT NULL DEFAULT CURRENT_DATE,
     value DECIMAL(10, 2) NOT NULL,
-    movement_type INT NOT NULL, -- 1: ENTRADA, 2: SAIDA
+    movement_type INT NOT NULL, -- 1: ENTRADA, 2: SAIDA, 3: DEVOLUCAO
+    sale_id INT,
     identifier TEXT NOT NULL,
     description TEXT,
     created_at TIMESTAMP DEFAULT now()

@@ -52,13 +52,14 @@
     "@fontsource/inter": "^4.5.14",
     "@mui/material": "^7.3.7",
     "@tailwindcss/postcss": "^4.1.12",
-    "apexcharts": "^5.3.6",
+    "apexcharts": "^3.45.2",
     "axios": "^1.13.4",
     "electron-squirrel-startup": "^1.0.1",
     "express": "^5.2.1",
     "fastify": "^5.7.2",
     "pg": "^8.17.2",
     "react": "^19.1.0",
+    "react-apexcharts": "^1.4.1",
     "react-dom": "^19.1.0",
     "react-icons": "^5.5.0"
   }
