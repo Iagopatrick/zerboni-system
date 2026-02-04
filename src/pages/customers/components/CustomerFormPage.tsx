@@ -230,6 +230,7 @@ export const CustomerFormPage = ({ mode, customerId, onBack }: CustomerFormPageP
             value={state}
             onChange={(e) => setState(e.target.value)}
             options={brazilStates}
+            disabled={mode ==="view"}
           />
         </div>
         
