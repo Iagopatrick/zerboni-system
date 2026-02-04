@@ -3,6 +3,7 @@
 
 import { contextBridge, ipcRenderer } from "electron";
 import { SupplierType } from "./types/supplier";
+import { SupplierPaymentType } from "./types/supplier-payment";
 
 interface PaginationParams {
   search?: string;
@@ -23,6 +24,9 @@ type UpdateCustomerPayload = Partial<CreateCustomerPayload>;
 
 type CreateSupplierPayload = Omit<SupplierType, "id" | "created_at">;
 type UpdateSupplierPayload = Partial<CreateSupplierPayload>;
+
+type CreateSupplierPaymentPayload = Omit<SupplierPaymentType, "id" | "created_at">;
+type UpdateSupplierPaymentPayload = Partial<CreateSupplierPaymentPayload>;
 
 contextBridge.exposeInMainWorld("api", {
   getUsers: (params?: PaginationParams) =>
@@ -63,4 +67,16 @@ contextBridge.exposeInMainWorld("api", {
 
   deleteSuppliers: (id: number) =>
     ipcRenderer.invoke("delete-suppliers", id) as Promise<void>,
+
+  getSuppliersPayments: (params?: PaginationParams) =>
+    ipcRenderer.invoke("get-suppliers-payments", params) as Promise<PaginatedResponse<SupplierPaymentType>>,
+
+  createSuppliersPayments: (data: CreateSupplierPaymentPayload) =>
+    ipcRenderer.invoke("create-suppliers-payments", data) as Promise<SupplierPaymentType>,
+
+  updateSuppliersPayments: (id: number, data: UpdateSupplierPaymentPayload) =>
+    ipcRenderer.invoke("update-suppliers-payments", { id, data }) as Promise<SupplierPaymentType>,
+
+  deleteSuppliersPayments: (id: number) =>
+    ipcRenderer.invoke("delete-suppliers-payments", id) as Promise<void>,
 });
