@@ -59,13 +59,13 @@ export function GenericTable<T>({ columns, data, page, totalPages, totalElements
         </TableHead>
 
         <TableBody>
-          {data.map((row: any, idx: number) => (
+          {data?.map((row: any, idx: number) => (
             <TableRow
               key={idx}
               onClick={() => onRowClick && onRowClick(row)}
               className="cursor-pointer hover:bg-orange-50 transition-colors"
             >
-              {columns.map((col) => (
+              {columns?.map((col) => (
                 <TableCell
                   key={col.key}
                   sx={{

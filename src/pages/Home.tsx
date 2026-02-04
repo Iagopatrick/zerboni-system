@@ -14,7 +14,7 @@ import { Dashboard } from "./dashboard/Dashboard";
 type UserView = "list" | "create" | "view" | "edit";
 
 export const HomePage = () => {
-  const [tab, setTab] = useState<TabsEnum>(TabsEnum.STOCK);
+  const [tab, setTab] = useState<TabsEnum>(TabsEnum.DASHBOARD);
 
   const [userView, setUserView] = useState<UserView>("list");
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
