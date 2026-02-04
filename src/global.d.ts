@@ -1,3 +1,5 @@
+import { ProductType } from "./types/product";
+
 export { };
 
 declare module "*.jpg" {
@@ -47,6 +49,9 @@ type UpdateCustomerPayload = Partial<CreateCustomerPayload>;
 type CreateSupplierPayload = Omit<SupplierType, "id" | "created_at">;
 type UpdateSupplierPayload = Partial<CreateSupplierPayload>;
 
+type CreateProductPayload = Omit<ProductType, "id" | "created_at">;
+type UpdateProductPayload = Partial<CreateProductPayload>;
+
 declare global {
   interface Window {
     api: {
@@ -93,6 +98,20 @@ declare global {
 
       deleteSuppliers: (id: number) => Promise<void>;
 
+      getProducts: (
+        params?: PaginationParams
+      ) => Promise<PaginatedResponse<ProductType>>;
+
+      createProducts: (
+        data: CreateSupplierPayload
+      ) => Promise<ProductType>;
+
+      updateProducts: (
+        id: number,
+        data: UpdateSupplierPayload
+      ) => Promise<any>;
+
+      deleteProducts: (id: number) => Promise<void>;
       getDashboardData: () => Promise<any>;
     };
   }
