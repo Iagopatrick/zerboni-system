@@ -112,6 +112,7 @@ declare global {
       ) => Promise<any>;
 
       deleteProducts: (id: number) => Promise<void>;
+      getDashboardData: () => Promise<any>;
     };
   }
 }

@@ -4,6 +4,7 @@
 import { contextBridge, ipcRenderer } from "electron";
 import { SupplierType } from "./types/supplier";
 import { ProductType } from "./types/product";
+import { DashboardData } from "./pages/dashboard/Dashboard";
 
 interface PaginationParams {
   search?: string;
@@ -79,4 +80,7 @@ contextBridge.exposeInMainWorld("api", {
 
   deleteProducts: (id: number) =>
     ipcRenderer.invoke("delete-products", id) as Promise<void>,
+  
+  getDashboardData: () =>
+    ipcRenderer.invoke("get-dashboard-data") as Promise<DashboardData>,
 });
