@@ -1,6 +1,7 @@
 import axios, { AxiosError } from "axios";
 import { ipcMain } from "electron";
 import { SupplierType } from "./types/supplier";
+import { SupplierPaymentType } from "./types/supplier-payment";
 import { ProductType } from "./types/product";
 import fs from "fs";
 import path from "path";
@@ -227,6 +228,44 @@ ipcMain.handle(
   "delete-products",
   async (_event, id: number) => {
     await axios.delete(`${API_URL}/products/${id}`);
+    return true;
+  }
+);
+
+type CreateSupplierPaymentPayload = Omit<SupplierPaymentType, "id" | "created_at">;
+type UpdateSupplierPaymentPayload = Partial<CreateSupplierPaymentPayload>;
+
+ipcMain.handle(
+  "get-suppliers-payments",
+  async (_event, params?: PaginationParams) => {
+    const res = await axios.get(`${API_URL}/suppliers-payments`, { params });
+    return res.data as PaginatedResponse<SupplierPaymentType>;
+  }
+);
+
+ipcMain.handle(
+  "create-suppliers-payments",
+  async (_event, data: CreateSupplierPaymentPayload) => {
+    const res = await axios.post(`${API_URL}/suppliers-payments`, data);
+    return res.data as SupplierPaymentType;
+  }
+);
+
+ipcMain.handle(
+  "update-suppliers-payments",
+  async (
+    _event,
+    { id, data }: { id: number; data: UpdateSupplierPaymentPayload }
+  ) => {
+    const res = await axios.put(`${API_URL}/suppliers-payments/${id}`, data);
+    return res.data as SupplierPaymentType;
+  }
+);
+
+ipcMain.handle(
+  "delete-suppliers-payments",
+  async (_event, id: number) => {
+    await axios.delete(`${API_URL}/suppliers-payments/${id}`);
     return true;
   }
 );

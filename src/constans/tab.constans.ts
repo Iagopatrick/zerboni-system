@@ -3,6 +3,7 @@ export enum TabsEnum {
     "USUARIOS",
     "STOCK",
     "SUPPLIERS",
+    "SUPPLIERS_PAYMENT",
     "REPORTS",
     "SALES",
     "CUSTOMERS"
