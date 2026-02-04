@@ -6,16 +6,24 @@ export async function productRoutes(app: FastifyInstance) {
 
     app.get("/", async (request, reply) => {
         try {
-            const filters = request.query as any;
-            const products = await service.listProducts(filters);
-            return products;
+            const { search = "", page = "1", limit = "10" } = request.query as any;
+            const pageNum = parseInt(page, 10);
+            const limitNum = parseInt(limit, 10);
+            const result = await service.listProducts({
+                search,
+                page: pageNum,
+                limit: limitNum,
+            });
+            return result;
         } catch (err: any) {
             reply.code(500);
-            return { message: "Erro ao buscar produtos", error: err.message };
+            return {
+                message: err.message,
+                status: "error",
+            };
         }
-
-
     });
+
 
     app.post("/", async (request, reply) => {
         const { registrationId, branch, productGroup, brand, description, reference, price, stock, productType, unitOfMeasure, images, tradeName, active, size, supplierCnpj } = request.body as {

@@ -113,34 +113,6 @@ export const Navbar = ({ tab, setTab }: NavbarProps) => {
           }
         />
         <NavbarItem
-          label="Pagamento de Fornecedores"
-          isActive={tab === TabsEnum.SUPPLIERS_PAYMENT}
-          onClick={() => setTab && setTab(TabsEnum.SUPPLIERS_PAYMENT)}
-          icon={
-            <TruckIcon
-              width={33}
-              height={33}
-              color={
-                tab === TabsEnum.SUPPLIERS_PAYMENT ? colors.selected : colors.primary
-              }
-            />
-          }
-        />
-        <NavbarItem
-          label="Relatórios"
-          isActive={tab === TabsEnum.REPORTS}
-          onClick={() => setTab && setTab(TabsEnum.REPORTS)}
-          icon={
-            <AssetsIcon
-              width={33}
-              height={33}
-              color={
-                tab === TabsEnum.REPORTS ? colors.selected : colors.primary
-              }
-            />
-          }
-        />
-        <NavbarItem
           label="Vendas"
           isActive={tab === TabsEnum.SALES}
           onClick={() => setTab && setTab(TabsEnum.SALES)}
