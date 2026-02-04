@@ -1,6 +1,9 @@
 import axios from "axios";
-import { ipcMain } from "electron";
 import { SupplierType } from "./types/supplier";
+import { ProductType } from "./types/product";
+import { app, BrowserWindow, ipcMain, dialog } from "electron";
+import fs from "fs";
+import path from "path";
 
 interface PaginationParams {
   search?: string;
@@ -106,6 +109,45 @@ ipcMain.handle(
   "delete-suppliers",
   async (_event, id: number) => {
     await axios.delete(`${API_URL}/suppliers/${id}`);
+    return true;
+  }
+);
+
+type CreateProductPayload = Omit<ProductType, "id" | "created_at">;
+type UpdateProductPayload = Partial<CreateProductPayload>;
+
+ipcMain.handle(
+  "get-products",
+  async (_event, params?: PaginationParams) => {
+    const res = await axios.get(`${API_URL}/products`, { params });
+    return res.data as PaginatedResponse<ProductType>;
+  }
+);
+
+ipcMain.handle(
+  "create-products",
+  async (_event, data: UpdateProductPayload) => {
+    const res = await axios.post(`${API_URL}/products`, data);
+    return res.data as ProductType;
+  }
+);
+
+ipcMain.handle(
+  "update-products",
+  async (
+    _event,
+    { id, data }: { id: number; data: UpdateProductPayload }
+  ) => {
+    const res = await axios.put(
+      `${API_URL}/products/${id}`, data);
+    return res.data as ProductType;
+  }
+);
+
+ipcMain.handle(
+  "delete-products",
+  async (_event, id: number) => {
+    await axios.delete(`${API_URL}/products/${id}`);
     return true;
   }
 );

@@ -7,14 +7,19 @@ import { CustomerPage } from "./customers/Customer";
 import { CustomerFormPage } from "./customers/components/CustomerFormPage";
 import { SupplierPage } from "./suppliers/Supplier";
 import { SupplierFormPage } from "./suppliers/components/SupplierFormPage";
+import { ProductPage } from "./products/Product";
+import { ProductFormPage } from "./products/components/ProductFormPage";
 
 type UserView = "list" | "create" | "view" | "edit";
 
 export const HomePage = () => {
-  const [tab, setTab] = useState<TabsEnum>(TabsEnum.SUPPLIERS);
+  const [tab, setTab] = useState<TabsEnum>(TabsEnum.STOCK);
 
   const [userView, setUserView] = useState<UserView>("list");
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+
+  const [productView, setProductView] = useState<UserView>("list");
+  const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
 
   const [customerView, setCustomerView] = useState<UserView>("list");
   const [selectedCustomerId, setSelectedCustomerId] = useState<number | null>(null);
@@ -49,6 +54,35 @@ export const HomePage = () => {
               onBack={() => {
                 setUserView("list");
                 setSelectedUserId(null);
+              }}
+            />
+          )}
+        </>
+      )}
+
+      {tab === TabsEnum.STOCK && (
+        <>
+          {productView === "list" && (
+            <ProductPage
+              onCreate={() => setProductView("create")}
+              onView={(id) => {
+                setSelectedProductId(id);
+                setProductView("view");
+              }}
+              onEdit={(id) => {
+                setSelectedProductId(id);
+                setProductView("edit");
+              }}
+            />
+          )}
+
+          {(productView === "create" || productView === "view" || productView === "edit") && (
+            <ProductFormPage
+              mode={productView}
+              productId={selectedProductId}
+              onBack={() => {
+                setProductView("list");
+                setSelectedProductId(null);
               }}
             />
           )}
