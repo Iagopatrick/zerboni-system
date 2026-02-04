@@ -68,6 +68,46 @@ export class SaleRepository {
     }
   }
 
+  async listAllSales() {
+    // Consulta que une a venda ao registro fiscal e ao cliente, conforme o diagrama
+    const query = `
+    SELECT 
+      s.id, 
+      s.total_value, 
+      s.payment_type, 
+      s.sale_type, 
+      s.status_type, 
+      s.created_at,
+      c.name as customer_name,
+      fr.identifier as fiscal_identifier
+    FROM sales s
+    JOIN customers c ON s.customer_id = c.id
+    JOIN fiscal_records fr ON s.fiscal_record_id = fr.id
+    ORDER BY s.created_at DESC
+  `;
+
+    const { rows } = await pool.query(query);
+    return rows;
+  }
+
+  async findById(id: number) {
+    const query = `
+    SELECT 
+      s.*, 
+      c.name as customer_name,
+      fr.identifier as fiscal_identifier,
+      json_agg(si.*) as items -- Isso traz os itens da venda como um array
+    FROM sales s
+    JOIN customers c ON s.customer_id = c.id
+    JOIN fiscal_records fr ON s.fiscal_record_id = fr.id
+    LEFT JOIN sale_items si ON si.sale_id = s.id
+    WHERE s.id = $1
+    GROUP BY s.id, c.name, fr.identifier
+  `;
+    const { rows } = await pool.query(query, [id]);
+    return rows[0];
+  }
+
   async listConditionals(cpf?: string) {
     let query = `
     SELECT s.*, c.name, c.cpf 

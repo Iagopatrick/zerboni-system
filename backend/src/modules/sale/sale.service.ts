@@ -48,6 +48,16 @@ export class SaleService {
     return sale;
   }
 
+  async listAllSales() {
+    return this.repository.listAllSales();
+  }
+
+  async getSaleById(id: number) {
+    const sale = await this.repository.findById(id);
+    if (!sale) throw new Error("Venda não encontrada");
+    return sale;
+  }
+
   // UC05 - Fluxo de Vitrine Virtual (Filtro por Telefone)
   async listInterests(phoneNumber?: string) {
     return this.repository.listInterests(phoneNumber);

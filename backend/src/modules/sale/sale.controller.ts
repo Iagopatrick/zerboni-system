@@ -27,6 +27,25 @@ export async function saleRoutes(app: FastifyInstance) {
     }
   });
 
+  app.get("/", async (request, reply) => {
+    try {
+      const sales = await service.listAllSales();
+      return sales;
+    } catch (error) {
+      return reply.status(400).send({ error: (error as Error).message });
+    }
+  });
+
+  app.get("/:id", async (request, reply) => {
+    const { id } = request.params as { id: string };
+    try {
+      const sale = await service.getSaleById(Number(id));
+      return sale;
+    } catch (error) {
+      return reply.status(404).send({ error: (error as Error).message });
+    }
+  });
+
   // UC05 - Finalização de venda com interesse (Filtro: Telefone)
   app.get("/interests", async (request, reply) => {
     // Corrigido: O UC05 pede filtro por número de telefone para interesses
