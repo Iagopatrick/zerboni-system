@@ -1,5 +1,21 @@
 import { FastifyInstance } from "fastify";
 import { SaleService } from "./sale.service";
+import { Customer } from "../customer/customer.repository";
+
+// Mapeamento para o campo 'sale_type' no banco de dados
+export type SaleType = 
+  | "Normal"      // 1: Venda direta
+  | "Interesse"   // 2: Vitrine Virtual (Sem estoque)
+  | "Condicional"; // 3: Levar para provar
+
+// Mapeamento para o campo 'payment_type' no banco de dados
+// Importante para a RN04 (Descontos)
+export type CustomerPaymentType =
+  | "Dinheiro"
+  | "Pix"
+  | "Cartao_Credito"
+  | "Cartao_Debito"
+  | "Crediario";
 
 export async function saleRoutes(app: FastifyInstance) {
   const service = new SaleService();
@@ -15,8 +31,8 @@ export async function saleRoutes(app: FastifyInstance) {
           unitPrice: number;
         }>;
         // Alinhado ao Diagrama: Enviar o ID do Enum (1: Dinheiro, 5: Pix, etc)
-        paymentType: number;
-        saleType: number; // 1: Normal, 2: Interesse, 3: Condicional
+        paymentType: CustomerPaymentType;
+        saleType: SaleType; // Normal, Interesse, Condicional
         sellerId: string;
       };
 
