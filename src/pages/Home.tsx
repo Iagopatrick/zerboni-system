@@ -7,6 +7,8 @@ import { CustomerPage } from "./customers/Customer";
 import { CustomerFormPage } from "./customers/components/CustomerFormPage";
 import { SupplierPage } from "./suppliers/Supplier";
 import { SupplierFormPage } from "./suppliers/components/SupplierFormPage";
+import { SupplierPaymentPage } from "./suppliers-payment/SupplierPayment";
+import { SupplierPaymentFormPage } from "./suppliers-payment/components/SupplierPaymentFormPage";
 import { ProductPage } from "./products/Product";
 import { ProductFormPage } from "./products/components/ProductFormPage";
 import { Dashboard } from "./dashboard/Dashboard";
@@ -33,6 +35,12 @@ export const HomePage = () => {
   const [selectedSupplierId, setSelectedSupplierId] = useState<number | null>(
     null,
   );
+
+  const [supplierPaymentView, setSupplierPaymentView] =
+    useState<UserView>("list");
+  const [selectedSupplierPaymentId, setSelectedSupplierPaymentId] = useState<
+    number | null
+  >(null);
 
   return (
     <div className="flex h-full bg-bluePrimary/85">
@@ -162,6 +170,37 @@ export const HomePage = () => {
         </>
       )}
 
+      {tab === TabsEnum.SUPPLIERS_PAYMENT && (
+        <>
+          {supplierPaymentView === "list" && (
+            <SupplierPaymentPage
+              onCreate={() => setSupplierPaymentView("create")}
+              onView={(id) => {
+                setSelectedSupplierPaymentId(id);
+                setSupplierPaymentView("view");
+              }}
+              onEdit={(id) => {
+                setSelectedSupplierPaymentId(id);
+                console.log(id);
+                setSupplierPaymentView("edit");
+              }}
+            />
+          )}
+
+          {(supplierPaymentView === "create" ||
+            supplierPaymentView === "view" ||
+            supplierPaymentView === "edit") && (
+            <SupplierPaymentFormPage
+              mode={supplierPaymentView}
+              supplierPaymentId={selectedSupplierPaymentId}
+              onBack={() => {
+                setSupplierPaymentView("list");
+                setSelectedSupplierPaymentId(null);
+              }}
+            />
+          )}
+        </>
+      )}
       {tab === TabsEnum.DASHBOARD && <Dashboard />}
     </div>
   );

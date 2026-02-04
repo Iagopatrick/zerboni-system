@@ -49,6 +49,8 @@ type UpdateCustomerPayload = Partial<CreateCustomerPayload>;
 type CreateSupplierPayload = Omit<SupplierType, "id" | "created_at">;
 type UpdateSupplierPayload = Partial<CreateSupplierPayload>;
 
+type CreateSupplierPaymentPayload = Omit<SupplierPaymentType, "id" | "created_at">;
+type UpdateSupplierPaymentPayload = Partial<CreateSupplierPaymentPayload>;
 type CreateProductPayload = Omit<ProductType, "id" | "created_at">;
 type UpdateProductPayload = Partial<CreateProductPayload>;
 
@@ -98,6 +100,20 @@ declare global {
 
       deleteSuppliers: (id: number) => Promise<void>;
 
+      getSuppliersPayments: (
+        params?: PaginationParams
+      ) => Promise<PaginatedResponse<SupplierPaymentType>>;
+
+      createSuppliersPayments: (
+        data: CreateSupplierPaymentPayload
+      ) => Promise<SupplierPaymentType>;
+
+      updateSuppliersPayments: (
+        id: number,
+        data: UpdateSupplierPaymentPayload
+      ) => Promise<any>;
+
+      deleteSuppliersPayments: (id: number) => Promise<void>;
       getProducts: (
         params?: PaginationParams
       ) => Promise<PaginatedResponse<ProductType>>;
