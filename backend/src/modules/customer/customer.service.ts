@@ -9,6 +9,25 @@ interface ListCustomersParams {
 export class CustomerService {
     private repository = new CustomerRepository();
 
+    private optionalFieldsValidator(
+        cleanCpf?: string,
+        cleanCep?: string,
+        cleanPhone?: string,
+    ) {
+        // Validação de tamanho de campos (cnpj, cep, telefone e fax)
+        if (cleanCpf?.length !== 11) {
+            throw new Error("CPF inválido: deve conter 11 dígitos numéricos.");
+        }
+
+        if (cleanCep?.length !== 8) {
+            throw new Error("CEP inválido: deve conter 8 dígitos numéricos.")
+        }
+
+        if (cleanPhone?.length !== 11) {
+            throw new Error("Telefone inválido: deve conter 11 dígitos numéricos.")
+        }
+    }
+
     async listCustomers({
         search = "",
         page = 1,
@@ -49,6 +68,8 @@ export class CustomerService {
         // 3. Verifica o Telefone individualmente
         const phoneExists = await this.repository.findWithFilters({ phoneNumber: data.phoneNumber });
         if (phoneExists.length > 0) throw new Error("Este telefone já está cadastrado.");
+
+        this.optionalFieldsValidator(cleanCpf, cleanCep, cleanPhone);
 
         // Se nenhum 'throw' foi disparado, pode salvar
         return this.repository.create({
