@@ -35,10 +35,13 @@ async getDashboardData() {
     let payment = {['PIX']: 0, ['CREDITO']: 0, ['DEBITO']: 0, ['DINHEIRO']: 0, ['CHEQUE']: 0};
     const expenses = await salesService.listFiscalRecords();
     const sales = await salesService.listSales();
-    const salesTotalPerMonth = expenses.reduce((acc: Record<number, number>, fiscalRecord) => {
+    const salesTotalPerMonth = expenses.reduce((acc: Record<number, {
+        out: number;
+        in: number;
+    }>, fiscalRecord) => {
         const month = new Date(fiscalRecord.date).getMonth() + 1;
         if (!acc[month]) {
-            acc[month] = 0;
+            acc[month] = { out: 0, in: 0 };
         }
         const sale = sales.find(s => s.fiscal_record_id === fiscalRecord.id);
         if (!!sale) {
@@ -48,7 +51,7 @@ async getDashboardData() {
         }
         const isEntry = fiscalRecord.movement_type === 1; 
         const value = fiscalRecord.value ? parseFloat(fiscalRecord.value.toString()) : 0;
-        acc[month] = isEntry ? acc[month] + value : acc[month] - value;
+        acc[month] = isEntry ? { ...acc[month], in: acc[month].in + value } : { ...acc[month], out: acc[month].out + value };
         totalExpenses += isEntry ?  0 : value;
         totalSales += isEntry ? value : 0;
         return acc;

@@ -7,20 +7,25 @@ import { CustomerPage } from "./customers/Customer";
 import { CustomerFormPage } from "./customers/components/CustomerFormPage";
 import { SupplierPage } from "./suppliers/Supplier";
 import { SupplierFormPage } from "./suppliers/components/SupplierFormPage";
+import { Dashboard } from "./dashboard/Dashboard";
 
 type UserView = "list" | "create" | "view" | "edit";
 
 export const HomePage = () => {
-  const [tab, setTab] = useState<TabsEnum>(TabsEnum.SUPPLIERS);
+  const [tab, setTab] = useState<TabsEnum>(TabsEnum.DASHBOARD);
 
   const [userView, setUserView] = useState<UserView>("list");
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 
   const [customerView, setCustomerView] = useState<UserView>("list");
-  const [selectedCustomerId, setSelectedCustomerId] = useState<number | null>(null);
+  const [selectedCustomerId, setSelectedCustomerId] = useState<number | null>(
+    null,
+  );
 
   const [supplierView, setSupplierView] = useState<UserView>("list");
-  const [selectedSupplierId, setSelectedSupplierId] = useState<number | null>(null);
+  const [selectedSupplierId, setSelectedSupplierId] = useState<number | null>(
+    null,
+  );
 
   return (
     <div className="flex h-full bg-bluePrimary/85">
@@ -42,7 +47,9 @@ export const HomePage = () => {
             />
           )}
 
-          {(userView === "create" || userView === "view" || userView === "edit") && (
+          {(userView === "create" ||
+            userView === "view" ||
+            userView === "edit") && (
             <UserFormPage
               mode={userView}
               userId={selectedUserId}
@@ -71,7 +78,9 @@ export const HomePage = () => {
             />
           )}
 
-          {(customerView === "create" || customerView === "view" || customerView === "edit") && (
+          {(customerView === "create" ||
+            customerView === "view" ||
+            customerView === "edit") && (
             <CustomerFormPage
               mode={customerView}
               customerId={selectedCustomerId}
@@ -100,7 +109,9 @@ export const HomePage = () => {
             />
           )}
 
-          {(supplierView === "create" || supplierView === "view" || supplierView === "edit") && (
+          {(supplierView === "create" ||
+            supplierView === "view" ||
+            supplierView === "edit") && (
             <SupplierFormPage
               mode={supplierView}
               supplierId={selectedSupplierId}
@@ -112,6 +123,8 @@ export const HomePage = () => {
           )}
         </>
       )}
+
+      {tab === TabsEnum.DASHBOARD && <Dashboard />}
     </div>
   );
 };

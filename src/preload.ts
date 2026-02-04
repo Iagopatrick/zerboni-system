@@ -3,6 +3,7 @@
 
 import { contextBridge, ipcRenderer } from "electron";
 import { SupplierType } from "./types/supplier";
+import { DashboardData } from "./pages/dashboard/Dashboard";
 
 interface PaginationParams {
   search?: string;
@@ -63,4 +64,7 @@ contextBridge.exposeInMainWorld("api", {
 
   deleteSuppliers: (id: number) =>
     ipcRenderer.invoke("delete-suppliers", id) as Promise<void>,
+  
+  getDashboardData: () =>
+    ipcRenderer.invoke("get-dashboard-data") as Promise<DashboardData>,
 });

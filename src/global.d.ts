@@ -92,6 +92,8 @@ declare global {
       ) => Promise<any>;
 
       deleteSuppliers: (id: number) => Promise<void>;
+
+      getDashboardData: () => Promise<any>;
     };
   }
 }

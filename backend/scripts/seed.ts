@@ -3,6 +3,8 @@ import * as path from 'path';
 import * as dotenv from 'dotenv';
 import { pool } from '../database';
 import { createFiscalExpense } from './fiscal-records.seed';
+import bcrypt from "bcrypt";
+
 
 // Carrega variáveis de ambiente
 dotenv.config({ path: path.join(__dirname, '../../.env') });
@@ -23,28 +25,32 @@ async function seed() {
     await pool.query('TRUNCATE TABLE suppliers CASCADE');
     await pool.query('TRUNCATE TABLE customers CASCADE');
     await pool.query('TRUNCATE TABLE users CASCADE');
-
+    const passwordHash = await bcrypt.hash("senha123", 10);
     // 1. SEED USERS
     console.log('\n👤 Criando usuários...');
-    await pool.query(`
-      INSERT INTO users (name, email) VALUES
-      ('João Silva', 'joao.silva@example.com'),
-      ('Maria Santos', 'maria.santos@example.com'),
-      ('Pedro Oliveira', 'pedro.oliveira@example.com'),
-      ('Ana Costa', 'ana.costa@example.com')
-      ON CONFLICT (email) DO NOTHING;
-    `);
+await pool.query(
+  `
+  INSERT INTO users (name, email, password)
+  VALUES
+    ('João Silva', 'joao.silva@example.com', $1),
+    ('Maria Santos', 'maria.santos@example.com', $1),
+    ('Pedro Oliveira', 'pedro.oliveira@example.com', $1),
+    ('Ana Costa', 'ana.costa@example.com', $1)
+  ON CONFLICT (email) DO NOTHING;
+`,
+  [passwordHash]
+);
     console.log('✅ 4 usuários criados');
 
     // 2. SEED CUSTOMERS
     console.log('\n🛍️  Criando clientes...');
     await pool.query(`
       INSERT INTO customers (name, cpf, cep, street, neighborhood, state, street_number, phone_number, email) VALUES
-      ('Carlos Mendes', '12345678901', '01310100', 'Avenida Paulista', 'Bela Vista', 'SP', 1000, '(11)98765-4321', 'carlos.mendes@email.com'),
-      ('Fernanda Lima', '98765432101', '20040020', 'Rua do Ouvidor', 'Centro', 'RJ', 50, '(21)99876-5432', 'fernanda.lima@email.com'),
-      ('Roberto Gomes', '55555555555', '30140071', 'Rua da Bahia', 'Funcionarios', 'MG', 1200, '(31)99999-8888', 'roberto.gomes@email.com'),
-      ('Juliana Ferreira', '11111111111', '40015000', 'Avenida Sete de Setembro', 'Centro', 'BA', 800, '(71)97777-6666', 'juliana.ferreira@email.com'),
-      ('Gustavo Martins', '22222222222', '50010000', 'Rua Recife', 'Pina', 'PE', 420, '(81)98888-7777', 'gustavo.martins@email.com')
+      ('Carlos Mendes', '12345678901', '01310100', 'Avenida Paulista', 'Bela Vista', 'SP', 1000, '11987654321', 'carlos.mendes@email.com'),
+      ('Fernanda Lima', '98765432101', '20040020', 'Rua do Ouvidor', 'Centro', 'RJ', 50, '21998765432', 'fernanda.lima@email.com'),
+      ('Roberto Gomes', '55555555555', '30140071', 'Rua da Bahia', 'Funcionarios', 'MG', 1200, '31999998888', 'roberto.gomes@email.com'),
+      ('Juliana Ferreira', '11111111111', '40015000', 'Avenida Sete de Setembro', 'Centro', 'BA', 800, '71977776666', 'juliana.ferreira@email.com'),
+      ('Gustavo Martins', '22222222222', '50010000', 'Rua Recife', 'Pina', 'PE', 420, '81988887777', 'gustavo.martins@email.com')
       ON CONFLICT (email) DO NOTHING;
     `);
     console.log('✅ 5 clientes criados');
@@ -53,11 +59,11 @@ async function seed() {
     console.log('\n🚚 Criando fornecedores...');
     await pool.query(`
       INSERT INTO suppliers (legal_name, active, cep, street, street_number, neighborhood, city, state, phone_number, cnpj, producer_tax_id, state_tax_id, email, cash_account, tax_regime, payment_methods, notes) VALUES
-      ('Distribuidora ABC LTDA', true, '01310100', 'Avenida Brasil', 500, 'Jardins', 'São Paulo', 'SP', '(11)3333-4444', '12345678000195', NULL, '123456789', 'contato@abc-dist.com', '00000000000000000000000', 'Simples Nacional', ARRAY['Dinheiro', 'Pix', 'Cheque'], 'Fornecedor principal'),
-      ('Produtos XYZ S.A.', true, '20040020', 'Rua Castelo', 100, 'Saúde', 'Rio de Janeiro', 'RJ', '(21)4444-5555', '98765432000198', 'RGP.123456789', NULL, 'vendas@xyz.com.br', '11111111111111111111111', 'Lucro Presumido', ARRAY['Cartao_debito', 'Cartao_credito', 'Pix'], NULL),
-      ('Fornecedora Premium EIRELI', true, '30140071', 'Avenida Getúlio', 700, 'Savassi', 'Belo Horizonte', 'MG', '(31)5555-6666', '55555555000123', NULL, '987654321', 'info@premium.com.br', '22222222222222222222222', 'Lucro Real', ARRAY['Dinheiro', 'Cartao_credito'], 'Qualidade premium'),
-      ('Importadora Global', true, '40015000', 'Rua Direita', 250, 'Comércio', 'Salvador', 'BA', '(71)6666-7777', '11111111000456', 'RGP.987654321', '555555555', 'export@global.com.br', '33333333333333333333333', 'Simples Nacional', ARRAY['Pix', 'Cheque'], NULL),
-      ('Comércio Nordeste', true, '50010000', 'Avenida Maurício de Nassau', 900, 'Boa Viagem', 'Recife', 'PE', '(81)7777-8888', '22222222000789', NULL, '111111111', 'admin@nordeste.com.br', '44444444444444444444444', 'Lucro Presumido', ARRAY['Dinheiro', 'Cheque', 'Pix'], NULL)
+      ('Distribuidora ABC LTDA', true, '01310100', 'Avenida Brasil', 500, 'Jardins', 'São Paulo', 'SP', '1133334444', '12345678000195', NULL, '123456789', 'contato@abc-dist.com', '00000000000000000000000', 'Simples Nacional', ARRAY['Dinheiro', 'Pix', 'Cheque'], 'Fornecedor principal'),
+      ('Produtos XYZ S.A.', true, '20040020', 'Rua Castelo', 100, 'Saúde', 'Rio de Janeiro', 'RJ', '2144445555', '98765432000198', 'RGP.123456789', NULL, 'vendas@xyz.com.br', '11111111111111111111111', 'Lucro Presumido', ARRAY['Cartao_debito', 'Cartao_credito', 'Pix'], NULL),
+      ('Fornecedora Premium EIRELI', true, '30140071', 'Avenida Getúlio', 700, 'Savassi', 'Belo Horizonte', 'MG', '3155556666', '55555555000123', NULL, '987654321', 'info@premium.com.br', '22222222222222222222222', 'Lucro Real', ARRAY['Dinheiro', 'Cartao_credito'], 'Qualidade premium'),
+      ('Importadora Global', true, '40015000', 'Rua Direita', 250, 'Comércio', 'Salvador', 'BA', '7166667777', '11111111000456', 'RGP.987654321', '555555555', 'export@global.com.br', '33333333333333333333333', 'Simples Nacional', ARRAY['Pix', 'Cheque'], NULL),
+      ('Comércio Nordeste', true, '50010000', 'Avenida Maurício de Nassau', 900, 'Boa Viagem', 'Recife', 'PE', '8177778888', '22222222000789', NULL, '111111111', 'admin@nordeste.com.br', '44444444444444444444444', 'Lucro Presumido', ARRAY['Dinheiro', 'Cheque', 'Pix'], NULL)
       ON CONFLICT (cnpj) DO NOTHING;
     `);
     console.log('✅ 5 fornecedores criados');
