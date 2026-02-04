@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS suppliers (
   city TEXT NOT NULL,
   state TEXT NOT NULL,
   phone_number CHAR(11) NOT NULL,
-  fax CHAR(14),
+  fax CHAR(11),
   cnpj CHAR(14) NOT NULL UNIQUE,
   producer_tax_id VARCHAR(50),
   municipal_tax_id VARCHAR(50),
