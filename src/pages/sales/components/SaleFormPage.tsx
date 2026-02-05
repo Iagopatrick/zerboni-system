@@ -16,7 +16,13 @@ export const SaleFormPage = ({ mode, saleId, onBack }: SaleFormPageProps) => {
   const [cpf, setCpf] = useState("");
   const [paymentType, setPaymentType] = useState("1"); // 1: Dinheiro, 5: Pix
   const [items, setItems] = useState<
-    { productId: number; name: string; quantity: number; unitPrice: number }[]
+    {
+      productId: number;
+      name: string;
+      quantity: number;
+      unitPrice: number;
+      description: string;
+    }[]
   >([]);
   const [total, setTotal] = useState(0);
 
@@ -64,6 +70,7 @@ export const SaleFormPage = ({ mode, saleId, onBack }: SaleFormPageProps) => {
                   name: i.product_name || `Produto #${i.product_id}`,
                   quantity: i.quantity,
                   unitPrice: Number(i.unit_price),
+                  description: i.product_description || "",
                 })),
               );
             }
@@ -104,6 +111,7 @@ export const SaleFormPage = ({ mode, saleId, onBack }: SaleFormPageProps) => {
       console.log("Cliente selecionado com sucesso:", customer.name);
     }
   };
+  console.log(availableProducts);
 
   const addItem = (productId: string) => {
     const product = availableProducts.find((p) => p.id === Number(productId));
@@ -127,6 +135,7 @@ export const SaleFormPage = ({ mode, saleId, onBack }: SaleFormPageProps) => {
           name: product.tradeName || product.name,
           quantity: 1,
           unitPrice: Number(product.price),
+          description: product.description || "",
         },
       ]);
     }
@@ -146,7 +155,7 @@ export const SaleFormPage = ({ mode, saleId, onBack }: SaleFormPageProps) => {
       totalVenda: total,
     });
 
-    if(items.length === 0) {
+    if (items.length === 0) {
       return alert("Erro: Adicione ao menos um item à venda.");
     }
 
@@ -218,7 +227,10 @@ export const SaleFormPage = ({ mode, saleId, onBack }: SaleFormPageProps) => {
                 // Forçamos a captura do valor do evento explicitamente
                 onChange={(e) => {
                   const selectedId = e.target.value;
-                  console.log("Evento onChange disparado com valor:", selectedId);
+                  console.log(
+                    "Evento onChange disparado com valor:",
+                    selectedId,
+                  );
                   handleCustomerChange(selectedId);
                 }}
                 options={customers.map((c) => ({
@@ -260,7 +272,7 @@ export const SaleFormPage = ({ mode, saleId, onBack }: SaleFormPageProps) => {
                 onChange={(e) => addItem(e.target.value)}
                 options={[
                   ...availableProducts.map((p) => ({
-                    label: `${p.tradeName || p.name} - R$ ${p.price}`,
+                    label: `${p.tradeName || p.description} - R$ ${p.price}`,
                     value: String(p.id),
                   })),
                 ]}
@@ -276,7 +288,7 @@ export const SaleFormPage = ({ mode, saleId, onBack }: SaleFormPageProps) => {
               >
                 <div className="flex flex-col gap-1">
                   <span className="text-gray-800 font-medium">
-                    {item.productId} - {item.name}
+                    {item.productId} - {item.description}
                   </span>
 
                   {/* Botões de Quantidade */}

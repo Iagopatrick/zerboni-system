@@ -10,6 +10,7 @@ import { AssetsIcon } from "../assets/icons/AssetsIcon";
 import { LogoutIcon } from "../assets/icons/LogoutIcon";
 import userImg from "../assets/images/dc.jpg";
 import { ClientIcon } from "../assets/icons/ClientIcon";
+import { SaleIcon } from "../assets/icons/SaleIcon";
 interface NavbarProps {
   setTab?: (tab: TabsEnum) => void;
   tab?: TabsEnum;
@@ -117,7 +118,7 @@ export const Navbar = ({ tab, setTab }: NavbarProps) => {
           isActive={tab === TabsEnum.SALES}
           onClick={() => setTab && setTab(TabsEnum.SALES)}
           icon={
-            <LogoutIcon
+            <SaleIcon
               width={33}
               height={33}
               color={tab === TabsEnum.SALES ? colors.selected : colors.primary}
@@ -132,7 +133,9 @@ export const Navbar = ({ tab, setTab }: NavbarProps) => {
             <ClientIcon
               width={33}
               height={33}
-              color={tab === TabsEnum.CUSTOMERS ? colors.selected : colors.primary}
+              color={
+                tab === TabsEnum.CUSTOMERS ? colors.selected : colors.primary
+              }
             />
           }
         />

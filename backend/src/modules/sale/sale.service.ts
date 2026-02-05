@@ -77,4 +77,26 @@ export class SaleService {
   async listConditionals(cpf?: string) {
     return this.repository.listConditionals(cpf);
   }
+
+    async listSales(options?: {
+    id?: string;
+    customerId?: string;
+    fiscalRecordId?: string;
+  }) {
+    return this.repository.listSales(options);
+  }
+
+  async listFiscalRecords(): Promise<
+    {
+      id: string;
+      date: Date;
+      value: number;
+      movement_type: number;
+      identifier: string;
+      description?: string;
+      created_at: Date;
+    }[]
+  > {
+    return this.repository.listFiscalRecords();
+  }
 }
