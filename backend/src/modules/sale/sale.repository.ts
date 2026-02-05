@@ -88,9 +88,12 @@ export class SaleRepository {
 
   // Métodos de busca para os Fluxos de Evento (Interesse e Condicional)
   async listInterests(phone?: string) {
-    const query =
-      "SELECT * FROM sales_interests WHERE status = 'OPEN'" +
-      (phone ? " AND customer_phone = $1" : "");
+    const query = `
+    SELECT s.*, c.name, c.phoneNumber 
+    FROM sales s
+    JOIN customers c ON s.customer_id = c.id
+    WHERE s.sale_type = 2 -- 2 = INTERESSE
+  `;
     const { rows } = await pool.query(query, phone ? [phone] : []);
     return rows;
   }
@@ -98,43 +101,71 @@ export class SaleRepository {
   async listSales(options?: {
     id?: string;
     customerId?: string;
-    fiscalRecordId?: string;
+    search?: string; // Adicionado para suportar sua SearchBar
   }): Promise<any[]> {
+    // Alteramos a query para buscar o nome do cliente da tabela 'customers'
     let query = `
-      SELECT * FROM sales WHERE 1=1
-    `;
+    SELECT 
+      s.*, 
+      c.name as customer_name 
+    FROM sales s
+    LEFT JOIN customers c ON s.customer_id = c.id
+    WHERE 1=1
+  `;
+
     const values: any[] = [];
     let counter = 1;
 
     if (options?.id) {
-      query += ` AND id = $${counter}`;
+      query += ` AND s.id = $${counter}`;
       values.push(options.id);
       counter++;
     }
 
-    if (options?.customerId) {
-      query += ` AND customer_id = $${counter}`;
-      values.push(options.customerId);
+    // Lógica para a SearchBar (Busca por nome do cliente ou ID)
+    if (options?.search) {
+      query += ` AND (c.name ILIKE $${counter} OR CAST(s.id AS TEXT) ILIKE $${counter})`;
+      values.push(`%${options.search}%`);
       counter++;
     }
 
-    if (options?.fiscalRecordId) {
-      query += ` AND fiscal_record_id = $${counter}`;
-      values.push(options.fiscalRecordId);
-      counter++;
-    }
+    query += ` ORDER BY s.created_at DESC`;
 
     const { rows } = await pool.query(query, values);
     return rows;
   }
 
+  async getSaleById(id: number): Promise<any> {
+    const query = `
+    SELECT 
+      s.*, 
+      c.name as customer_name,
+      c.cpf as customer_cpf,
+      (
+        SELECT json_agg(json_build_object(
+          'product_id', si.product_id,
+          'product_name', p.trade_name, -- BUSCA O NOME COMERCIAL AQUI
+          'quantity', si.quantity,
+          'unit_price', si.unit_price
+        ))
+        FROM sale_items si
+        JOIN products p ON si.product_id = p.id -- JOIN PARA PEGAR O NOME DO PRODUTO
+        WHERE si.sale_id = s.id
+      ) as items
+    FROM sales s
+    LEFT JOIN customers c ON s.customer_id = c.id -- JOIN PARA PEGAR O NOME DO CLIENTE
+    WHERE s.id = $1
+  `;
 
+    const { rows } = await pool.query(query, [id]);
+    return rows.length > 0 ? rows[0] : null;
+  }
+  
   async listFiscalRecords() {
     const query = `
       SELECT * FROM fiscal_records ORDER BY created_at DESC
     `;
     const { rows } = await pool.query(query);
     return rows;
-  }  
-
   }
+}

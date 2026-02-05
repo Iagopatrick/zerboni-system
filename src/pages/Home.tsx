@@ -12,6 +12,8 @@ import { SupplierPaymentFormPage } from "./suppliers-payment/components/Supplier
 import { ProductPage } from "./products/Product";
 import { ProductFormPage } from "./products/components/ProductFormPage";
 import { Dashboard } from "./dashboard/Dashboard";
+import { SalePage } from "./sales/Sale";
+import { SaleFormPage } from "./sales/components/SaleFormPage";
 
 type UserView = "list" | "create" | "view" | "edit";
 
@@ -25,6 +27,9 @@ export const HomePage = () => {
   const [selectedProductId, setSelectedProductId] = useState<number | null>(
     null,
   );
+
+  const [saleView, setSaleView] = useState<UserView>("list");
+  const [selectedSaleId, setSelectedSaleId] = useState<number | null>(null);
 
   const [customerView, setCustomerView] = useState<UserView>("list");
   const [selectedCustomerId, setSelectedCustomerId] = useState<number | null>(
@@ -107,6 +112,33 @@ export const HomePage = () => {
           )}
         </>
       )}
+
+      {tab === TabsEnum.SALES && (
+        <>
+          {saleView === "list" && (
+            <SalePage
+              onCreate={() => setSaleView("create")}
+              onView={(id) => {
+                setSelectedSaleId(id);
+                setSaleView("view");
+              }}
+            />
+          )}
+
+          {(saleView === "create" || saleView === "view") && (
+            <SaleFormPage
+              mode={saleView}
+              saleId={selectedSaleId}
+              onBack={() => {
+                setSaleView("list");
+                setSelectedSaleId(null);
+              }}
+            />
+          )}
+        </>
+      )}
+
+      {tab === TabsEnum.DASHBOARD && <Dashboard />}
 
       {tab === TabsEnum.CUSTOMERS && (
         <>

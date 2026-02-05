@@ -1,8 +1,6 @@
 import "dotenv/config";
 import { Pool } from "pg";
 
-
-
 export const pool = new Pool({
   host: process.env.DB_HOST,
   port: Number(process.env.DB_PORT),
@@ -11,3 +9,10 @@ export const pool = new Pool({
   database: process.env.DB_NAME,
 });
 
+pool.query("SELECT NOW()", (err, res) => {
+  if (err) {
+    console.error("❌ ERRO AO CONECTAR NO POSTGRES:", err.message);
+  } else {
+    console.log("✅ CONEXÃO COM O BANCO ESTABELECIDA EM:", res.rows[0].now);
+  }
+});

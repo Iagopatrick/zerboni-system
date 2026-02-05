@@ -1,6 +1,7 @@
 import { ProductType } from "./types/product";
+import { SaleType } from './types/sale';
 
-export { };
+export {};
 
 declare module "*.jpg" {
   const src: string;
@@ -41,6 +42,14 @@ type CreateUserPayload = {
   email: string;
 };
 
+type CreateSalePayload = {
+  cpf: string;
+  items: any[];
+  paymentType: number; 
+  saleType: number;
+  sellerId: string;
+};
+
 type UpdateUserPayload = Partial<CreateUserPayload>;
 
 type CreateCustomerPayload = Omit<CustomerType, "id" | "created_at">;
@@ -49,7 +58,10 @@ type UpdateCustomerPayload = Partial<CreateCustomerPayload>;
 type CreateSupplierPayload = Omit<SupplierType, "id" | "created_at">;
 type UpdateSupplierPayload = Partial<CreateSupplierPayload>;
 
-type CreateSupplierPaymentPayload = Omit<SupplierPaymentType, "id" | "created_at">;
+type CreateSupplierPaymentPayload = Omit<
+  SupplierPaymentType,
+  "id" | "created_at"
+>;
 type UpdateSupplierPaymentPayload = Partial<CreateSupplierPaymentPayload>;
 type CreateProductPayload = Omit<ProductType, "id" | "created_at">;
 type UpdateProductPayload = Partial<CreateProductPayload>;
@@ -58,77 +70,73 @@ declare global {
   interface Window {
     api: {
       getUsers: (
-        params?: PaginationParams
+        params?: PaginationParams,
       ) => Promise<PaginatedResponse<UserType>>;
 
       createUsers: (data: CreateUserPayload) => Promise<UserType>;
 
-      updateUsers: (
-        id: number,
-        data: UpdateUserPayload
-      ) => Promise<UserType>;
+      updateUsers: (id: number, data: UpdateUserPayload) => Promise<UserType>;
 
       deleteUsers: (id: number) => Promise<void>;
 
       getCustomers: (
-        params?: PaginationParams
+        params?: PaginationParams,
       ) => Promise<PaginatedResponse<CustomerType>>;
 
-      createCustomers: (
-        data: CreateCustomerPayload
-      ) => Promise<CustomerType>;
+      createCustomers: (data: CreateCustomerPayload) => Promise<CustomerType>;
 
       updateCustomers: (
         id: number,
-        data: UpdateCustomerPayload
+        data: UpdateCustomerPayload,
       ) => Promise<CustomerType>;
 
       deleteCustomers: (id: number) => Promise<void>;
 
       getSuppliers: (
-        params?: PaginationParams
+        params?: PaginationParams,
       ) => Promise<PaginatedResponse<SupplierType>>;
 
-      createSuppliers: (
-        data: CreateSupplierPayload
-      ) => Promise<SupplierType>;
+      createSuppliers: (data: CreateSupplierPayload) => Promise<SupplierType>;
 
       updateSuppliers: (
         id: number,
-        data: UpdateSupplierPayload
+        data: UpdateSupplierPayload,
       ) => Promise<any>;
 
       deleteSuppliers: (id: number) => Promise<void>;
 
       getSuppliersPayments: (
-        params?: PaginationParams
+        params?: PaginationParams,
       ) => Promise<PaginatedResponse<SupplierPaymentType>>;
 
       createSuppliersPayments: (
-        data: CreateSupplierPaymentPayload
+        data: CreateSupplierPaymentPayload,
       ) => Promise<SupplierPaymentType>;
 
       updateSuppliersPayments: (
         id: number,
-        data: UpdateSupplierPaymentPayload
+        data: UpdateSupplierPaymentPayload,
       ) => Promise<any>;
 
       deleteSuppliersPayments: (id: number) => Promise<void>;
       getProducts: (
-        params?: PaginationParams
+        params?: PaginationParams,
       ) => Promise<PaginatedResponse<ProductType>>;
 
-      createProducts: (
-        data: CreateSupplierPayload
-      ) => Promise<ProductType>;
+      createProducts: (data: CreateSupplierPayload) => Promise<ProductType>;
 
-      updateProducts: (
-        id: number,
-        data: UpdateSupplierPayload
-      ) => Promise<any>;
+      updateProducts: (id: number, data: UpdateSupplierPayload) => Promise<any>;
 
       deleteProducts: (id: number) => Promise<void>;
       getDashboardData: () => Promise<any>;
+
+      listSales: (params?: PaginationParams) => Promise<PaginatedResponse<SaleType>>;
+
+      createSale: (data: CreateSalePayload) => Promise<SaleType>;
+
+      getSaleById: (id: number) => Promise<SaleType>;
+
+      deleteSale: (id: number) => Promise<void>;
     };
   }
 }

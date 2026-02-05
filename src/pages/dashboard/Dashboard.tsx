@@ -27,8 +27,11 @@ export type DashboardData = {
   payment: Payment[];
 };
 
-export const formatToBRL = (value: number): string => {
-  return value.toLocaleString("pt-BR", {
+export const formatToBRL = (value: number | undefined | null): string => {
+  // Se o valor não existir, usamos 0 como padrão para não quebrar
+  const safeValue = value ?? 0;
+
+  return safeValue.toLocaleString("pt-BR", {
     style: "currency",
     currency: "BRL",
   });
@@ -40,17 +43,23 @@ export const Dashboard = () => {
   const [sales, setSales] = useState(0);
   const [expenses, setExpenses] = useState(0);
   async function loadDashboardData() {
-    try {
-      const data = await window.api.getDashboardData();
-      console.log(data as DashboardData);
-      setMovimentation(data.movimentationPerMonth);
-      setPayments(data.payment);
-      setExpenses(data.totalExpenses);
-      setSales(data.totalSales);
-    } catch (error) {
-      console.error("Erro ao carregar dados do dashboard:", error);
+  try {
+    const data = await window.api.getDashboardData();
+    console.log("Dados recebidos:", data);
+
+    // Verifica se data existe e se não é um erro antes de setar os estados
+    if (data && !data.error) {
+      setMovimentation(data.movimentationPerMonth || []);
+      setPayments(data.payment || []);
+      setExpenses(data.totalExpenses || 0);
+      setSales(data.totalSales || 0);
+    } else {
+      console.warn("API retornou sucesso falso ou dados vazios:", data?.error);
     }
+  } catch (error) {
+    console.error("Erro crítico ao carregar dados do dashboard:", error);
   }
+}
 
   useEffect(() => {
     loadDashboardData();
@@ -58,7 +67,14 @@ export const Dashboard = () => {
 
   return (
     <div className="p-4">
-      <Box sx={{ width: "1000px", display: "flex", marginBottom: "32px", justifyContent: "space-between" }}>
+      <Box
+        sx={{
+          width: "1000px",
+          display: "flex",
+          marginBottom: "32px",
+          justifyContent: "space-between",
+        }}
+      >
         <CardCashflow title="Total de Vendas" value={formatToBRL(sales)} />
         <CardCashflowIn
           title="Total de Despesas"
