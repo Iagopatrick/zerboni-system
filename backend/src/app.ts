@@ -7,6 +7,7 @@ import { productRoutes } from "./modules/product/product.controller";
 import { supplierPaymentRoutes } from "./modules/supplier-payment/supplier-payment.controller";
 import { dashboardRoutes } from "./modules/dashboard/dashboard.controller";
 import { fiscalReportRoutes } from "./modules/fiscal-report/fiscal-report.controller";
+import { saleRoutes } from "./modules/sale/sale.controller";
 
 export const app = Fastify();
 
@@ -21,3 +22,4 @@ app.register(productRoutes, { prefix: "/api/products" });
 app.register(supplierPaymentRoutes, { prefix: "/api/suppliers-payments" });
 app.register(dashboardRoutes, { prefix: "/api/dashboard" });
 app.register(fiscalReportRoutes, { prefix: "/api/fiscal-report" });
+app.register(saleRoutes, { prefix: "/api/sales" });
